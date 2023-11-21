@@ -30,8 +30,8 @@ test('It can render data', async () => {
 
   expect(instance.data.get()).toEqual({});
 
-  sendEvent('newData', {id: 'firstID'});
-  sendEvent('newData', {id: 'secondID'});
+  sendEvent('newData', {instanceId: 'firstID'});
+  sendEvent('newData', {instanceId: 'secondID'});
 
   expect(await renderer.findByTestId('firstID')).not.toBeNull();
   expect(await renderer.findByTestId('secondID')).toMatchInlineSnapshot(`
