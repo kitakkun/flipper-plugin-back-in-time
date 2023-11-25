@@ -47,7 +47,7 @@ export default function InstanceList({instances, onSelectedProperty, onClickRefr
         <ListSubheader
           id="nested-list-subheader"
           component="div"
-          sx={{width: "100%", display: "flex", justifyContent: "space-between", alignItems: "middle"}}
+          sx={{width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center"}}
         >
           Registered Instances
           <Refresh onClick={onClickRefresh}/>
