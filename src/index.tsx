@@ -1,20 +1,8 @@
 import React from 'react';
 import {PluginClient, usePlugin, createState, useValue, Layout, Panel, DetailSidebar} from 'flipper-plugin';
-import {Button} from "antd";
-import { JsonViewer } from '@textea/json-viewer';
-
-/**
- * information about debug target instance
- * this object is sent after registration of the instance completed.
- * @param instanceId IdentityHashCode of the instance
- * @param propertyNames list of names of debuggable property
- * @param registeredAt
- */
-type DebugTargetRegistrationInfo = {
-  instanceUUID: string;
-  propertyNames: string;
-  registeredAt: number;
-}
+import InstanceList from "./components/InstanceList";
+import {Typography} from "@mui/material";
+import {InstanceInfo, InstanceInfoWithAliveState} from "./data/InstanceInfo";
 
 type ValueChangedEvent = {
   instanceUUID: string;
@@ -24,31 +12,38 @@ type ValueChangedEvent = {
 }
 
 type SetPropertyValueMethod = {
-  instanceId: string;
-  propertyKey: string;
+  instanceUUID: string;
+  propertyName: string;
   value: string;
 }
 
 type Events = {
   error: string;
-  register: DebugTargetRegistrationInfo;
+  register: InstanceInfo;
   valueChanged: ValueChangedEvent;
 };
 
+type InstanceAliveStatusRequest = {
+  instanceUUIDs: string[];
+}
+
 type Methods = {
   setPropertyValue(params: SetPropertyValueMethod): Promise<any>;
+  refreshInstanceAliveStatus(instanceUUIDs: InstanceAliveStatusRequest): Promise<boolean[]>;
 }
 
 // Read more: https://fbflipper.com/docs/tutorial/js-custom#creating-a-first-plugin
 // API: https://fbflipper.com/docs/extending/flipper-plugin#pluginclient
 export function plugin(client: PluginClient<Events, Methods>) {
-  const registeredInstanceInfo = createState<Record<string, DebugTargetRegistrationInfo>>({}, {persist: 'registrationInfo'})
-
+  const registeredInstanceInfo = createState<InstanceInfoWithAliveState[]>([], {persist: 'registrationInfo'})
   const valueChangeLog = createState<Record<string, ValueChangedEvent[]>>({}, {persist: 'valueChangeLog'})
 
   client.onMessage("register", (info) => {
     registeredInstanceInfo.update((draft) => {
-      draft[info.instanceUUID] = info;
+      draft.push({
+        ...info,
+        alive: true,
+      });
     });
   });
 
@@ -61,13 +56,31 @@ export function plugin(client: PluginClient<Events, Methods>) {
 
   function forceSetState(instanceId: string, propertyKey: string, value: string) {
     client.send("setPropertyValue", {
-      instanceId: instanceId,
-      propertyKey: propertyKey,
+      instanceUUID: instanceId,
+      propertyName: propertyKey,
       value: value,
     });
   }
 
-  return {registeredInstanceInfo, forceSetState, valueChangeLog};
+  const refreshInstanceAliveStatus = (instanceUUIDs: string[]) => {
+    if (instanceUUIDs.length == 0) return;
+    const response = client.send("refreshInstanceAliveStatus", {instanceUUIDs: instanceUUIDs});
+    response.then((result) => {
+      registeredInstanceInfo.update((draft) => {
+        draft.forEach((info) => {
+          const index = instanceUUIDs.indexOf(info.uuid);
+          info.alive = result[index];
+        });
+      });
+    });
+  }
+
+  return {registeredInstanceInfo, forceSetState, valueChangeLog, refreshInstanceAliveStatus};
+}
+
+type SelectedProperty = {
+  instanceId: string;
+  propertyKey: string;
 }
 
 // Read more: https://fbflipper.com/docs/tutorial/js-custom#building-a-user-interface-for-the-plugin
@@ -77,28 +90,39 @@ export function Component() {
   const registeredInfo = useValue(instance.registeredInstanceInfo);
   const forceSetState = instance.forceSetState;
   const valueChangeLog = useValue(instance.valueChangeLog);
+  const [selectedProperty, setSelectedProperty] = React.useState<SelectedProperty | null>(null);
 
+  const selectedInstance = selectedProperty ? registeredInfo.find((info) => info.uuid == selectedProperty.instanceId) : null;
+  const refreshInstanceAliveStatus = instance.refreshInstanceAliveStatus;
   return (
-    <Layout.ScrollContainer>
-      <h1>ValueChangedEvents</h1>
-      {Object.entries(valueChangeLog).map(([id, events]) => (
-        <div key={id}>
-          <h2>{id}</h2>
-          {events.map((event) => (
-            <pre key={event.valueType}>
-              <JsonViewer value={JSON.parse(event.value)} />
-            </pre>
-          ))}
-        </div>
-      ))}
-      {Object.entries(registeredInfo).map(([id, info]) => (
-        <pre key={id} data-testid={id}>
-          {JSON.stringify(info)}
-        </pre>
-      ))}
-      <Button onClick={() => forceSetState("hoge", "propertyKey", "stringified JSON value")}>
-        Click Me
-      </Button>
-    </Layout.ScrollContainer>
+    <>
+      <Layout.ScrollContainer>
+        <InstanceList
+          instances={registeredInfo}
+          onSelectedProperty={(instanceUUID, propertyName) => {
+            setSelectedProperty({instanceId: instanceUUID, propertyKey: propertyName});
+          }}
+          onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.uuid))}
+        />
+      </Layout.ScrollContainer>
+      <DetailSidebar
+        minWidth={400}
+      >
+        {selectedProperty ?
+          <>
+            <Typography variant="subtitle1">
+              Parent Instance Info
+            </Typography>
+            <Typography variant="subtitle1">
+              Property Info
+            </Typography>
+            <pre>
+            {JSON.stringify(selectedProperty)}
+          </pre>
+          </>
+          : null
+        }
+      </DetailSidebar>
+    </>
   );
 }
