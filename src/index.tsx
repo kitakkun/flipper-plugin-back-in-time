@@ -1,10 +1,11 @@
 import React from 'react';
 import {PluginClient, usePlugin, createState, useValue, Layout, Panel, DetailSidebar} from 'flipper-plugin';
 import InstanceList from "./components/InstanceList";
-import {Typography} from "@mui/material";
+import {Box, Table, TableBody, TableCell, TableContainer, TableRow, Typography} from "@mui/material";
 import {InstanceInfo, InstanceInfoWithAliveState} from "./data/InstanceInfo";
+import PropertyInspector from "./components/PropertyInspector";
 
-type ValueChangedEvent = {
+export type ValueChangedEvent = {
   instanceUUID: string;
   propertyName: string;
   value: string;
@@ -45,6 +46,9 @@ export function plugin(client: PluginClient<Events, Methods>) {
         alive: true,
       });
     });
+    valueChangeLog.update((draft) => {
+      draft[info.uuid] = [];
+    });
   });
 
   client.onMessage("valueChanged", (event) => {
@@ -78,7 +82,7 @@ export function plugin(client: PluginClient<Events, Methods>) {
   return {registeredInstanceInfo, forceSetState, valueChangeLog, refreshInstanceAliveStatus};
 }
 
-type SelectedProperty = {
+export type SelectedProperty = {
   instanceId: string;
   propertyKey: string;
 }
@@ -92,14 +96,17 @@ export function Component() {
   const valueChangeLog = useValue(instance.valueChangeLog);
   const [selectedProperty, setSelectedProperty] = React.useState<SelectedProperty | null>(null);
 
-  const selectedInstance = selectedProperty ? registeredInfo.find((info) => info.uuid == selectedProperty.instanceId) : null;
+  const [selectedInstance, setSelectedInstance] = React.useState<InstanceInfoWithAliveState | null>(null);
   const refreshInstanceAliveStatus = instance.refreshInstanceAliveStatus;
+
   return (
     <>
       <Layout.ScrollContainer>
         <InstanceList
           instances={registeredInfo}
           onSelectedProperty={(instanceUUID, propertyName) => {
+            const selectedInstance = registeredInfo.find((info) => info.uuid == instanceUUID);
+            setSelectedInstance(selectedInstance ? selectedInstance : null);
             setSelectedProperty({instanceId: instanceUUID, propertyKey: propertyName});
           }}
           onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.uuid))}
@@ -108,18 +115,13 @@ export function Component() {
       <DetailSidebar
         minWidth={400}
       >
-        {selectedProperty ?
-          <>
-            <Typography variant="subtitle1">
-              Parent Instance Info
-            </Typography>
-            <Typography variant="subtitle1">
-              Property Info
-            </Typography>
-            <pre>
-            {JSON.stringify(selectedProperty)}
-          </pre>
-          </>
+        {selectedProperty && selectedInstance ?
+          <PropertyInspector
+            selectedInstance={selectedInstance}
+            selectedProperty={selectedProperty}
+            selectedPropertyValueChangeLog={
+              valueChangeLog[selectedProperty.instanceId].filter((event) => event.propertyName == selectedProperty.propertyKey)
+            }/>
           : null
         }
       </DetailSidebar>
