@@ -80,7 +80,7 @@ export default function PropertyInspector(
           </TableHead>
           <TableBody>
             {selectedPropertyValueChangeLog.map((event) => (
-              <TableRow key={event.value}>
+              <TableRow>
                 <TableCell>{"TO BE FIXED SOON"}</TableCell>
                 <TableCell>{event.value}</TableCell>
               </TableRow>
