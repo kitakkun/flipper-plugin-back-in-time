@@ -57,10 +57,10 @@ export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
       .send("refreshInstanceAliveStatus", {instanceUUIDs: instanceUUIDs})
       .then((response) => {
         registeredInstances.update((draft) => {
-          response.isAlive.forEach((isAlive, instanceUUID) => {
+          Object.entries(response.isAlive).forEach(([instanceUUID, alive]) => {
             const index = draft.findIndex((info) => info.instanceUUID == instanceUUID);
             if (index == -1) return;
-            draft[index].alive = isAlive;
+            draft[index].alive = alive;
           });
         });
       });
