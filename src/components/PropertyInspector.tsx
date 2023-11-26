@@ -1,12 +1,13 @@
 import {Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
 import React from "react";
-import {InstanceInfoWithAliveState, PropertyInfo} from "../data/InstanceInfo";
-import {SelectedProperty, ValueChangedEvent} from "../index";
+import {DebuggableStateHolderInfo, PropertyInfo} from "../data/RegisterInstance";
+import {SelectedProperty} from "../index";
+import {NotifyValueChange} from "../events/FlipperIncomingEvents";
 
 type PropertyInspectorProps = {
-  selectedInstance: InstanceInfoWithAliveState;
+  selectedInstance: DebuggableStateHolderInfo;
   selectedProperty: SelectedProperty;
-  selectedPropertyValueChangeLog: ValueChangedEvent[];
+  selectedPropertyValueChangeLog: NotifyValueChange[];
 }
 
 export default function PropertyInspector(
@@ -27,11 +28,11 @@ export default function PropertyInspector(
           <TableBody>
             <TableRow key={"uuid"}>
               <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>id</TableCell>
-              <TableCell>{selectedInstance.uuid}</TableCell>
+              <TableCell>{selectedInstance.instanceUUID}</TableCell>
             </TableRow>
             <TableRow key={"type"}>
               <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>type</TableCell>
-              <TableCell>{selectedInstance.type}</TableCell>
+              <TableCell>{selectedInstance.instanceType}</TableCell>
             </TableRow>
             <TableRow key={"registeredAt"}>
               <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>registeredAt</TableCell>

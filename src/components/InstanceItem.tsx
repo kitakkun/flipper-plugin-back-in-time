@@ -1,14 +1,15 @@
-import {DebuggableStateHolderInstance} from "./InstanceList";
 import {Badge, Collapse, List, ListItem, ListItemButton, ListItemText} from "@mui/material";
 import React from "react";
 import {theme} from "flipper-plugin";
 import {ExpandLess, ExpandMore} from "@mui/icons-material";
-import {ValueChangedEvent} from "../index";
+
+import {NotifyValueChange} from "../events/FlipperIncomingEvents";
+import {DebuggableStateHolderInfo} from "../data/RegisterInstance";
 
 type InstanceItemProps = {
-  instance: DebuggableStateHolderInstance;
+  instance: DebuggableStateHolderInfo;
   onSelectedProperty: (instanceUUID: string, propertyName: string) => void;
-  valueChangedEvents: ValueChangedEvent[];
+  valueChangedEvents: NotifyValueChange[];
 }
 
 export default function InstanceItem({instance, onSelectedProperty, valueChangedEvents}: InstanceItemProps) {
@@ -18,7 +19,7 @@ export default function InstanceItem({instance, onSelectedProperty, valueChanged
     setOpen(!open);
   }
 
-  const filterEvents = (propertyName: string) => valueChangedEvents.filter((event) => event.instanceUUID == instance.uuid && event.propertyName == propertyName);
+  const filterEvents = (propertyName: string) => valueChangedEvents.filter((event) => event.instanceUUID == instance.instanceUUID && event.propertyName == propertyName);
   const eventLength = (propertyName: string) => filterEvents(propertyName).length;
 
   return (
@@ -30,9 +31,9 @@ export default function InstanceItem({instance, onSelectedProperty, valueChanged
         disabled={instance.properties.length == 0}
       >
         <ListItemText
-          primary={instance.type}
+          primary={instance.instanceType}
           primaryTypographyProps={{style: {fontSize: theme.fontSize.default}}}
-          secondary={instance.uuid}
+          secondary={instance.instanceUUID}
           secondaryTypographyProps={{style: {fontSize: theme.fontSize.small}}}
         />
         {instance.properties.length > 0 ? open ? <ExpandLess/> : <ExpandMore/> : null}
@@ -42,7 +43,7 @@ export default function InstanceItem({instance, onSelectedProperty, valueChanged
           {instance.properties.map((property) => (
             <ListItem key={property.name}>
               <ListItemButton disabled={!property.debuggable} style={{display: "flex"}} onClick={() =>
-                onSelectedProperty(instance.uuid, property.name)
+                onSelectedProperty(instance.instanceUUID, property.name)
               }>
                 {property.debuggable ?
                   <ListItemText

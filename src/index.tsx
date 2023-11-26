@@ -1,68 +1,45 @@
 import React, {useEffect} from 'react';
-import {PluginClient, usePlugin, createState, useValue, Layout, Panel, DetailSidebar} from 'flipper-plugin';
+import {createState, DetailSidebar, Layout, PluginClient, usePlugin, useValue} from 'flipper-plugin';
 import InstanceList from "./components/InstanceList";
-import {Box, Table, TableBody, TableCell, TableContainer, TableRow, Typography} from "@mui/material";
-import {InstanceInfo, InstanceInfoWithAliveState} from "./data/InstanceInfo";
+import {DebuggableStateHolderInfo} from "./data/RegisterInstance";
 import PropertyInspector from "./components/PropertyInspector";
-
-export type ValueChangedEvent = {
-  instanceUUID: string;
-  propertyName: string;
-  value: string;
-  valueType: string;
-}
-
-type SetPropertyValueMethod = {
-  instanceUUID: string;
-  propertyName: string;
-  value: string;
-}
-
-type Events = {
-  error: string;
-  register: InstanceInfo;
-  valueChanged: ValueChangedEvent;
-};
-
-type InstanceAliveStatusRequest = {
-  instanceUUIDs: string[];
-}
-
-type Methods = {
-  setPropertyValue(params: SetPropertyValueMethod): Promise<any>;
-  refreshInstanceAliveStatus(instanceUUIDs: InstanceAliveStatusRequest): Promise<boolean[]>;
-}
+import {IncomingEvents, NotifyValueChange} from "./events/FlipperIncomingEvents";
+import {OutgoingEvents} from "./events/FlipperOutgoingEvents";
 
 // Read more: https://fbflipper.com/docs/tutorial/js-custom#creating-a-first-plugin
 // API: https://fbflipper.com/docs/extending/flipper-plugin#pluginclient
-export function plugin(client: PluginClient<Events, Methods>) {
-  const registeredInstanceInfo = createState<InstanceInfoWithAliveState[]>([], {persist: 'registrationInfo'})
-  const valueChangeLog = createState<Record<string, ValueChangedEvent[]>>({}, {persist: 'valueChangeLog'})
+export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
+  const registeredInstances = createState<DebuggableStateHolderInfo[]>([], {persist: 'registrationInfo'})
+  const valueChangeLog = createState<Record<string, NotifyValueChange[]>>({}, {persist: 'valueChangeLog'})
 
-  client.onMessage("register", (info) => {
-    registeredInstanceInfo.update((draft) => {
+  client.onMessage("register", (event) => {
+    registeredInstances.update((draft) => {
       draft.push({
-        ...info,
+        instanceUUID: event.instanceUUID,
+        instanceType: event.instanceType,
+        properties: event.properties,
+        registeredAt: event.registeredAt,
         alive: true,
       });
     });
     valueChangeLog.update((draft) => {
-      draft[info.uuid] = [];
+      draft[event.instanceUUID] = [];
     });
   });
 
-  client.onMessage("valueChanged", (event) => {
+  client.onMessage("notifyValueChange", (event) => {
     valueChangeLog.update((draft) => {
       if (!draft[event.instanceUUID]) draft[event.instanceUUID] = [];
       draft[event.instanceUUID].push(event);
     });
   });
 
-  function forceSetState(instanceId: string, propertyKey: string, value: string) {
-    client.send("setPropertyValue", {
+  function forceSetState(instanceId: string, propertyKey: string, value: string, valueType: string) {
+    client.send("forceSetPropertyValue", {
       instanceUUID: instanceId,
       propertyName: propertyKey,
       value: value,
+      valueType: valueType,
     });
   }
 
@@ -70,16 +47,16 @@ export function plugin(client: PluginClient<Events, Methods>) {
     if (instanceUUIDs.length == 0) return;
     const response = client.send("refreshInstanceAliveStatus", {instanceUUIDs: instanceUUIDs});
     response.then((result) => {
-      registeredInstanceInfo.update((draft) => {
+      registeredInstances.update((draft) => {
         draft.forEach((info) => {
-          const index = instanceUUIDs.indexOf(info.uuid);
+          const index = instanceUUIDs.indexOf(info.instanceUUID);
           info.alive = result[index];
         });
       });
     });
   }
 
-  return {registeredInstanceInfo, forceSetState, valueChangeLog, refreshInstanceAliveStatus};
+  return {registeredInstanceInfo: registeredInstances, forceSetState, valueChangeLog, refreshInstanceAliveStatus};
 }
 
 export type SelectedProperty = {
@@ -96,13 +73,13 @@ export function Component() {
   const valueChangeLog = useValue(instance.valueChangeLog);
 
   const [selectedProperty, setSelectedProperty] = React.useState<SelectedProperty | null>(null);
-  const [selectedInstance, setSelectedInstance] = React.useState<InstanceInfoWithAliveState | null>(null);
-  const [selectedPropertyValueChangeLog, setSelectedPropertyValueChangeLog] = React.useState<ValueChangedEvent[]>([]);
+  const [selectedInstance, setSelectedInstance] = React.useState<DebuggableStateHolderInfo | null>(null);
+  const [selectedPropertyValueChangeLog, setSelectedPropertyValueChangeLog] = React.useState<NotifyValueChange[]>([]);
 
   useEffect(() => {
     const instanceUUID = selectedProperty?.instanceUUID;
     if (!instanceUUID) return;
-    const selectedInstance = registeredInfo.find((info) => info.uuid == instanceUUID);
+    const selectedInstance = registeredInfo.find((info) => info.instanceUUID == instanceUUID);
     setSelectedInstance(selectedInstance ? selectedInstance : null);
     setSelectedPropertyValueChangeLog(valueChangeLog[instanceUUID].filter((event) => event.propertyName == selectedProperty.propertyName));
   }, [selectedProperty, valueChangeLog])
@@ -117,7 +94,7 @@ export function Component() {
           onSelectedProperty={(instanceUUID, propertyName) => {
             setSelectedProperty({instanceUUID: instanceUUID, propertyName: propertyName});
           }}
-          onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.uuid))}
+          onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.instanceUUID))}
           valueChangedEvents={valueChangeLog}
         />
       </Layout.ScrollContainer>

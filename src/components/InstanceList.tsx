@@ -2,7 +2,9 @@ import {List, ListSubheader, Switch} from "@mui/material";
 import React from "react";
 import InstanceItem from "./InstanceItem";
 import {Refresh} from "@mui/icons-material";
-import {ValueChangedEvent} from "../index";
+
+import {NotifyValueChange} from "../events/FlipperIncomingEvents";
+import {DebuggableStateHolderInfo} from "../data/RegisterInstance";
 
 type Property = {
   name: string;
@@ -10,18 +12,11 @@ type Property = {
   type: string;
 }
 
-export type DebuggableStateHolderInstance = {
-  uuid: string;
-  type: string;
-  properties: Property[];
-  registeredAt: number;
-}
-
 type InstanceListProps = {
-  instances: DebuggableStateHolderInstance[];
+  instances: DebuggableStateHolderInfo[];
   onSelectedProperty: (instanceUUID: string, propertyName: string) => void;
   onClickRefresh: () => void;
-  valueChangedEvents: Record<string, ValueChangedEvent[]>;
+  valueChangedEvents: Record<string, NotifyValueChange[]>;
 }
 
 const instancesForTest = [
@@ -65,7 +60,7 @@ export default function InstanceList({instances, onSelectedProperty, onClickRefr
         <InstanceItem
           instance={instance}
           onSelectedProperty={onSelectedProperty}
-          valueChangedEvents={filterEvents(instance.uuid)}
+          valueChangedEvents={filterEvents(instance.instanceUUID)}
         />
       ))}
     </List>
