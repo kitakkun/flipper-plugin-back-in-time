@@ -16,7 +16,7 @@ export default function PropertyInspector(
     selectedPropertyValueChangeLog
   }: PropertyInspectorProps
 ) {
-  const property = selectedInstance.properties.find((property) => property.name == selectedProperty.propertyKey)
+  const property = selectedInstance.properties.find((property) => property.name == selectedProperty.propertyName)
   return (
     <Box padding={2}>
       <Typography variant="subtitle1">

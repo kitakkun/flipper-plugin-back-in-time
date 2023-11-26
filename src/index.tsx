@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {PluginClient, usePlugin, createState, useValue, Layout, Panel, DetailSidebar} from 'flipper-plugin';
 import InstanceList from "./components/InstanceList";
 import {Box, Table, TableBody, TableCell, TableContainer, TableRow, Typography} from "@mui/material";
@@ -83,8 +83,8 @@ export function plugin(client: PluginClient<Events, Methods>) {
 }
 
 export type SelectedProperty = {
-  instanceId: string;
-  propertyKey: string;
+  instanceUUID: string;
+  propertyName: string;
 }
 
 // Read more: https://fbflipper.com/docs/tutorial/js-custom#building-a-user-interface-for-the-plugin
@@ -94,9 +94,19 @@ export function Component() {
   const registeredInfo = useValue(instance.registeredInstanceInfo);
   const forceSetState = instance.forceSetState;
   const valueChangeLog = useValue(instance.valueChangeLog);
-  const [selectedProperty, setSelectedProperty] = React.useState<SelectedProperty | null>(null);
 
+  const [selectedProperty, setSelectedProperty] = React.useState<SelectedProperty | null>(null);
   const [selectedInstance, setSelectedInstance] = React.useState<InstanceInfoWithAliveState | null>(null);
+  const [selectedPropertyValueChangeLog, setSelectedPropertyValueChangeLog] = React.useState<ValueChangedEvent[]>([]);
+
+  useEffect(() => {
+    const instanceUUID = selectedProperty?.instanceUUID;
+    if (!instanceUUID) return;
+    const selectedInstance = registeredInfo.find((info) => info.uuid == instanceUUID);
+    setSelectedInstance(selectedInstance ? selectedInstance : null);
+    setSelectedPropertyValueChangeLog(valueChangeLog[instanceUUID].filter((event) => event.propertyName == selectedProperty.propertyName));
+  }, [selectedProperty, valueChangeLog])
+
   const refreshInstanceAliveStatus = instance.refreshInstanceAliveStatus;
 
   return (
@@ -105,9 +115,7 @@ export function Component() {
         <InstanceList
           instances={registeredInfo}
           onSelectedProperty={(instanceUUID, propertyName) => {
-            const selectedInstance = registeredInfo.find((info) => info.uuid == instanceUUID);
-            setSelectedInstance(selectedInstance ? selectedInstance : null);
-            setSelectedProperty({instanceId: instanceUUID, propertyKey: propertyName});
+            setSelectedProperty({instanceUUID: instanceUUID, propertyName: propertyName});
           }}
           onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.uuid))}
         />
@@ -119,9 +127,7 @@ export function Component() {
           <PropertyInspector
             selectedInstance={selectedInstance}
             selectedProperty={selectedProperty}
-            selectedPropertyValueChangeLog={
-              valueChangeLog[selectedProperty.instanceId].filter((event) => event.propertyName == selectedProperty.propertyKey)
-            }/>
+            selectedPropertyValueChangeLog={selectedPropertyValueChangeLog}/>
           : null
         }
       </DetailSidebar>
