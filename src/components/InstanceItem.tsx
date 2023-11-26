@@ -45,23 +45,15 @@ export default function InstanceItem({instance, onSelectedProperty, valueChanged
               <ListItemButton disabled={!property.debuggable} style={{display: "flex"}} onClick={() =>
                 onSelectedProperty(instance.instanceUUID, property.name)
               }>
-                {property.debuggable ?
-                  <ListItemText
-                    primary={property.name}
-                    primaryTypographyProps={{style: {fontSize: theme.fontSize.small}}}
-                    secondary={property.type}
-                    secondaryTypographyProps={{style: {fontSize: theme.fontSize.smaller}}}
-                  />
-                  :
-                  <ListItemText
-                    primary={property.name}
-                    primaryTypographyProps={{style: {fontSize: theme.fontSize.small}}}
-                    secondary={property.type}
-                    secondaryTypographyProps={{style: {fontSize: theme.fontSize.smaller}}}
-                  />
+                <ListItemText
+                  primary={property.name}
+                  primaryTypographyProps={{style: {fontSize: theme.fontSize.small}}}
+                  secondary={property.propertyType}
+                  secondaryTypographyProps={{style: {fontSize: theme.fontSize.smaller}}}
+                />
+                {!property.debuggable ?
+                  <span style={{color: "red", fontSize: theme.fontSize.small}}>Not Debuggable</span> : null
                 }
-                {/*{!property.debuggable ?*/}
-                {/*  <span style={{color: "red", fontSize: theme.fontSize.small}}>Not Debuggable</span> : null}*/}
                 {
                   eventLength(property.name) > 0 ?
                     <Badge badgeContent={eventLength(property.name)} color="primary" sx={{marginLeft: "auto"}}/> : null

@@ -14,7 +14,7 @@ export default function PropertyInspector(
   {
     selectedInstance,
     selectedProperty,
-    selectedPropertyValueChangeLog
+    selectedPropertyValueChangeLog,
   }: PropertyInspectorProps
 ) {
   const property = selectedInstance.properties.find((property) => property.name == selectedProperty.propertyName)
@@ -56,9 +56,13 @@ export default function PropertyInspector(
                 <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>name</TableCell>
                 <TableCell>{property.name}</TableCell>
               </TableRow>
-              <TableRow key={"type"}>
-                <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>type</TableCell>
-                <TableCell>{property.type}</TableCell>
+              <TableRow key={"property type"}>
+                <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>property type</TableCell>
+                <TableCell>{property.propertyType}</TableCell>
+              </TableRow>
+              <TableRow key={"value type"}>
+                <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>value type</TableCell>
+                <TableCell>{property.valueType}</TableCell>
               </TableRow>
               <TableRow key={"debuggable"}>
                 <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>debuggable</TableCell>

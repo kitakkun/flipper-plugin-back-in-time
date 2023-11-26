@@ -9,6 +9,7 @@ export type DebuggableStateHolderInfo = {
 export type PropertyInfo = {
   name: string;
   debuggable: boolean;
-  type: string;
+  propertyType: string;
+  valueType: string;
 }
 
