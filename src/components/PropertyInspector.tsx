@@ -23,22 +23,22 @@ export default function PropertyInspector(
         Parent Instance Info
       </Typography>
       <TableContainer>
-        <Table>
+        <Table size={"small"}>
           <TableBody>
             <TableRow key={"uuid"}>
-              <TableCell component={"th"} scope={"row"}>id</TableCell>
+              <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>id</TableCell>
               <TableCell>{selectedInstance.uuid}</TableCell>
             </TableRow>
             <TableRow key={"type"}>
-              <TableCell component={"th"} scope={"row"}>type</TableCell>
+              <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>type</TableCell>
               <TableCell>{selectedInstance.type}</TableCell>
             </TableRow>
             <TableRow key={"registeredAt"}>
-              <TableCell component={"th"} scope={"row"}>registeredAt</TableCell>
+              <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>registeredAt</TableCell>
               <TableCell>{selectedInstance.registeredAt}</TableCell>
             </TableRow>
             <TableRow key={"alive"}>
-              <TableCell component={"th"} scope={"row"}>alive</TableCell>
+              <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>alive</TableCell>
               <TableCell>{selectedInstance.alive ? "true" : "false"}</TableCell>
             </TableRow>
           </TableBody>
@@ -49,18 +49,18 @@ export default function PropertyInspector(
       </Typography>
       {property ?
         <TableContainer>
-          <Table>
+          <Table size={"small"}>
             <TableBody>
               <TableRow key={"name"}>
-                <TableCell component={"th"} scope={"row"}>name</TableCell>
+                <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>name</TableCell>
                 <TableCell>{property.name}</TableCell>
               </TableRow>
               <TableRow key={"type"}>
-                <TableCell component={"th"} scope={"row"}>type</TableCell>
+                <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>type</TableCell>
                 <TableCell>{property.type}</TableCell>
               </TableRow>
               <TableRow key={"debuggable"}>
-                <TableCell component={"th"} scope={"row"}>debuggable</TableCell>
+                <TableCell component={"th"} scope={"row"} style={{width: "10ch"}}>debuggable</TableCell>
                 <TableCell>{property.debuggable}</TableCell>
               </TableRow>
             </TableBody>
@@ -71,11 +71,11 @@ export default function PropertyInspector(
         Property Value Change Log
       </Typography>
       <TableContainer>
-        <Table>
+        <Table size={"small"}>
           <TableHead>
             <TableRow>
-              <TableCell>Time</TableCell>
-              <TableCell>Value</TableCell>
+              <TableCell style={{width: "10ch"}}>Time</TableCell>
+              <TableCell style={{width: "100%"}}>Value</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

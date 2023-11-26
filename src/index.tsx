@@ -120,9 +120,7 @@ export function Component() {
           onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.uuid))}
         />
       </Layout.ScrollContainer>
-      <DetailSidebar
-        minWidth={400}
-      >
+      <DetailSidebar width={600}>
         {selectedProperty && selectedInstance ?
           <PropertyInspector
             selectedInstance={selectedInstance}
