@@ -118,6 +118,7 @@ export function Component() {
             setSelectedProperty({instanceUUID: instanceUUID, propertyName: propertyName});
           }}
           onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.uuid))}
+          valueChangedEvents={valueChangeLog}
         />
       </Layout.ScrollContainer>
       <DetailSidebar width={600}>

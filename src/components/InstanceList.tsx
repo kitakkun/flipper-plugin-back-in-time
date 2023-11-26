@@ -2,6 +2,7 @@ import {List, ListSubheader, Switch} from "@mui/material";
 import React from "react";
 import InstanceItem from "./InstanceItem";
 import {Refresh} from "@mui/icons-material";
+import {ValueChangedEvent} from "../index";
 
 type Property = {
   name: string;
@@ -20,6 +21,7 @@ type InstanceListProps = {
   instances: DebuggableStateHolderInstance[];
   onSelectedProperty: (instanceUUID: string, propertyName: string) => void;
   onClickRefresh: () => void;
+  valueChangedEvents: Record<string, ValueChangedEvent[]>;
 }
 
 const instancesForTest = [
@@ -37,7 +39,12 @@ const instancesForTest = [
   {uuid: "hogehgoe5", type: "HogeViewModel", properties: [], registeredAt: 0},
 ]
 
-export default function InstanceList({instances, onSelectedProperty, onClickRefresh}: InstanceListProps) {
+export default function InstanceList({instances, onSelectedProperty, onClickRefresh, valueChangedEvents}: InstanceListProps) {
+  const filterEvents = (instanceUUID: string) => {
+    const events = valueChangedEvents[instanceUUID];
+    if (!events) return [];
+    return events;
+  }
   return (
     <List
       sx={{width: '100%', bgcolor: 'background.paper'}}
@@ -58,6 +65,7 @@ export default function InstanceList({instances, onSelectedProperty, onClickRefr
         <InstanceItem
           instance={instance}
           onSelectedProperty={onSelectedProperty}
+          valueChangedEvents={filterEvents(instance.uuid)}
         />
       ))}
     </List>

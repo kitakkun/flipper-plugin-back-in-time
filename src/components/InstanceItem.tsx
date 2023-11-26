@@ -1,20 +1,25 @@
 import {DebuggableStateHolderInstance} from "./InstanceList";
-import {Collapse, List, ListItem, ListItemButton, ListItemText} from "@mui/material";
+import {Badge, Collapse, List, ListItem, ListItemButton, ListItemText} from "@mui/material";
 import React from "react";
 import {theme} from "flipper-plugin";
 import {ExpandLess, ExpandMore} from "@mui/icons-material";
+import {ValueChangedEvent} from "../index";
 
 type InstanceItemProps = {
   instance: DebuggableStateHolderInstance;
   onSelectedProperty: (instanceUUID: string, propertyName: string) => void;
+  valueChangedEvents: ValueChangedEvent[];
 }
 
-export default function InstanceItem({instance, onSelectedProperty}: InstanceItemProps) {
+export default function InstanceItem({instance, onSelectedProperty, valueChangedEvents}: InstanceItemProps) {
   const [open, setOpen] = React.useState(true);
 
   const handleClick = () => {
     setOpen(!open);
   }
+
+  const filterEvents = (propertyName: string) => valueChangedEvents.filter((event) => event.instanceUUID == instance.uuid && event.propertyName == propertyName);
+  const eventLength = (propertyName: string) => filterEvents(propertyName).length;
 
   return (
     <>
@@ -54,8 +59,12 @@ export default function InstanceItem({instance, onSelectedProperty}: InstanceIte
                     secondaryTypographyProps={{style: {fontSize: theme.fontSize.smaller}}}
                   />
                 }
-                {!property.debuggable ?
-                  <span style={{color: "red", fontSize: theme.fontSize.small}}>Not Debuggable</span> : null}
+                {/*{!property.debuggable ?*/}
+                {/*  <span style={{color: "red", fontSize: theme.fontSize.small}}>Not Debuggable</span> : null}*/}
+                {
+                  eventLength(property.name) > 0 ?
+                    <Badge badgeContent={eventLength(property.name)} color="primary" sx={{marginLeft: "auto"}}/> : null
+                }
               </ListItemButton>
             </ListItem>
           ))}
