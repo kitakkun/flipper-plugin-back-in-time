@@ -1,6 +1,9 @@
+/**
+ * Outgoing events from desktop app
+ */
 export type OutgoingEvents = {
   forceSetPropertyValue(event: ForceSetPropertyValue): Promise<any>;
-  refreshInstanceAliveStatus(event: CheckInstanceAlive): Promise<boolean[]>;
+  refreshInstanceAliveStatus(event: CheckInstanceAlive): Promise<CheckInstanceAliveResponse>;
 }
 
 export type ForceSetPropertyValue = {

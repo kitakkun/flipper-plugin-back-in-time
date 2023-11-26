@@ -45,15 +45,17 @@ export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
 
   const refreshInstanceAliveStatus = (instanceUUIDs: string[]) => {
     if (instanceUUIDs.length == 0) return;
-    const response = client.send("refreshInstanceAliveStatus", {instanceUUIDs: instanceUUIDs});
-    response.then((result) => {
-      registeredInstances.update((draft) => {
-        draft.forEach((info) => {
-          const index = instanceUUIDs.indexOf(info.instanceUUID);
-          info.alive = result[index];
+    client
+      .send("refreshInstanceAliveStatus", {instanceUUIDs: instanceUUIDs})
+      .then((response) => {
+        registeredInstances.update((draft) => {
+          response.isAlive.forEach((isAlive, instanceUUID) => {
+            const index = draft.findIndex((info) => info.instanceUUID == instanceUUID);
+            if (index == -1) return;
+            draft[index].alive = isAlive;
+          });
         });
       });
-    });
   }
 
   return {registeredInstanceInfo: registeredInstances, forceSetState, valueChangeLog, refreshInstanceAliveStatus};
