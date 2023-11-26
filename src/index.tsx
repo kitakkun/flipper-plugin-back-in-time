@@ -5,14 +5,19 @@ import {DebuggableStateHolderInfo} from "./data/RegisterInstance";
 import PropertyInspector from "./components/PropertyInspector";
 import {IncomingEvents, NotifyValueChange} from "./events/FlipperIncomingEvents";
 import {OutgoingEvents} from "./events/FlipperOutgoingEvents";
+import {Box, Tab, Tabs} from "@mui/material";
 
 // Read more: https://fbflipper.com/docs/tutorial/js-custom#creating-a-first-plugin
 // API: https://fbflipper.com/docs/extending/flipper-plugin#pluginclient
 export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
-  const registeredInstances = createState<DebuggableStateHolderInfo[]>([], {persist: 'registrationInfo'})
-  const valueChangeLog = createState<Record<string, NotifyValueChange[]>>({}, {persist: 'valueChangeLog'})
+  const registeredInstances = createState<DebuggableStateHolderInfo[]>([], {persist: 'registrationInfo'});
+  const valueChangeLog = createState<Record<string, NotifyValueChange[]>>({}, {persist: 'valueChangeLog'});
+  const rawEventLog = createState<string[]>([], {persist: 'rawEventLog'});
 
   client.onMessage("register", (event) => {
+    rawEventLog.update((draft) => {
+      draft.push("register: " + JSON.stringify(event))
+    });
     registeredInstances.update((draft) => {
       draft.push({
         instanceUUID: event.instanceUUID,
@@ -28,6 +33,9 @@ export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
   });
 
   client.onMessage("notifyValueChange", (event) => {
+    rawEventLog.update((draft) => {
+      draft.push("notifyValueChange: " + JSON.stringify(event))
+    });
     valueChangeLog.update((draft) => {
       if (!draft[event.instanceUUID]) draft[event.instanceUUID] = [];
       draft[event.instanceUUID].push(event);
@@ -58,7 +66,7 @@ export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
       });
   }
 
-  return {registeredInstanceInfo: registeredInstances, forceSetState, valueChangeLog, refreshInstanceAliveStatus};
+  return {registeredInstanceInfo: registeredInstances, forceSetState, valueChangeLog, refreshInstanceAliveStatus, rawEventLog};
 }
 
 export type SelectedProperty = {
@@ -87,18 +95,38 @@ export function Component() {
   }, [selectedProperty, valueChangeLog])
 
   const refreshInstanceAliveStatus = instance.refreshInstanceAliveStatus;
+  const rawEventLog = useValue(instance.rawEventLog)
+  const [activeTabIndex, setActiveTabIndex] = React.useState(0);
 
   return (
     <>
       <Layout.ScrollContainer>
-        <InstanceList
-          instances={registeredInfo}
-          onSelectedProperty={(instanceUUID, propertyName) => {
-            setSelectedProperty({instanceUUID: instanceUUID, propertyName: propertyName});
-          }}
-          onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.instanceUUID))}
-          valueChangedEvents={valueChangeLog}
-        />
+        <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
+          <Tabs value={activeTabIndex} onChange={(_, index) => setActiveTabIndex(index)}
+                aria-label="basic tabs example">
+            <Tab label="Registered instances"/>
+            <Tab label="Raw event log"/>
+          </Tabs>
+        </Box>
+        {
+          activeTabIndex == 0 ?
+            <InstanceList
+              instances={registeredInfo}
+              onSelectedProperty={(instanceUUID, propertyName) => {
+                setSelectedProperty({instanceUUID: instanceUUID, propertyName: propertyName});
+              }}
+              onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.instanceUUID))}
+              valueChangedEvents={valueChangeLog}
+            /> : null
+        }
+        {
+          activeTabIndex == 1 ?
+            <Box padding={2}>
+              <ul>
+                {rawEventLog.map((log, index) => <li key={index}>{log}</li>)}
+              </ul>
+            </Box> : null
+        }
       </Layout.ScrollContainer>
       <DetailSidebar width={600}>
         {selectedProperty && selectedInstance ?
