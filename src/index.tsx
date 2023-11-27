@@ -1,10 +1,10 @@
 import React, {useEffect} from 'react';
-import {createState, DetailSidebar, Layout, PluginClient, usePlugin, useValue} from 'flipper-plugin';
+import {DetailSidebar, Layout, PluginClient, usePlugin, useValue} from 'flipper-plugin';
 import RegisteredInstancePage from "./page/registered_instance/RegisteredInstancePage";
 import {DebuggableStateHolderInfo} from "./data/RegisterInstance";
 import PropertyInspector from "./sidebar/PropertyInspector";
 import {IncomingEvents, NotifyValueChange} from "./events/FlipperIncomingEvents";
-import {ForceSetPropertyValue, OutgoingEvents} from "./events/FlipperOutgoingEvents";
+import {OutgoingEvents} from "./events/FlipperOutgoingEvents";
 import {Box, Tab, Tabs} from "@mui/material";
 import useViewModel from "./ViewModel";
 import RawLogPage from "./page/raw_logs/RawLogPage";

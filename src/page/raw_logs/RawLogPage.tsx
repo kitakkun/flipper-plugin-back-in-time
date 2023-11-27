@@ -1,15 +1,31 @@
-import {Box} from "@mui/material";
+import {Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import React from "react";
+import {RawEventLog} from "../../data/RawEventLog";
 
 type RawLogPageProps = {
-  rawEventLog: string[];
+  rawEventLog: RawEventLog[];
 }
 
 export default function RawLogPage({rawEventLog}: RawLogPageProps) {
   return (
     <Box padding={2}>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableCell>label</TableCell>
+            <TableCell>payload</TableCell>
+          </TableHead>
+          <TableBody>
+            {rawEventLog.map((log, index) =>
+              <TableRow key={index}>
+                <TableCell>{log.label}</TableCell>
+                <TableCell>{JSON.stringify(log.payload)}</TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <ul>
-        {rawEventLog.map((log, index) => <li key={index}>{log}</li>)}
       </ul>
     </Box>
   );

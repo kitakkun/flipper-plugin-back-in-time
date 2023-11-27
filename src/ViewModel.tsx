@@ -1,11 +1,12 @@
 import {DebuggableStateHolderInfo} from "./data/RegisterInstance";
 import {Atom, createState} from "flipper-plugin";
 import {NotifyMethodCall, NotifyValueChange, RegisterInstance} from "./events/FlipperIncomingEvents";
+import {RawEventLog} from "./data/RawEventLog";
 
 type State = {
   registeredInstances: Atom<DebuggableStateHolderInfo[]>
   valueChangeLog: Atom<Record<string, NotifyValueChange[]>>
-  rawEventLog: Atom<string[]>
+  rawEventLog: Atom<RawEventLog[]>
 };
 
 type Actions = {
@@ -23,11 +24,11 @@ type ViewModel = {
 export default function useViewModel(): ViewModel {
   const registeredInstances = createState<DebuggableStateHolderInfo[]>([], {persist: 'registrationInfo'});
   const valueChangeLog = createState<Record<string, NotifyValueChange[]>>({}, {persist: 'valueChangeLog'});
-  const rawEventLog = createState<string[]>([], {persist: 'rawEventLog'});
+  const rawEventLog = createState<RawEventLog[]>([], {persist: 'rawEventLog'});
 
   const register = (event: RegisterInstance) => {
     rawEventLog.update((draft) => {
-      draft.push("register: " + JSON.stringify(event))
+      draft.push({label: "register", payload: event});
     });
     registeredInstances.update((draft) => {
       draft.push({
@@ -45,7 +46,7 @@ export default function useViewModel(): ViewModel {
 
   const notifyValueChange = (event: NotifyValueChange) => {
     rawEventLog.update((draft) => {
-      draft.push("notifyValueChange: " + JSON.stringify(event))
+      draft.push({label: "notifyValueChange", payload: event});
     });
     valueChangeLog.update((draft) => {
       if (!draft[event.instanceUUID]) draft[event.instanceUUID] = [];
@@ -55,7 +56,7 @@ export default function useViewModel(): ViewModel {
 
   const notifyMethodCall = (event: NotifyMethodCall) => {
     rawEventLog.update((draft) => {
-      draft.push("notifyMethodCall: " + JSON.stringify(event))
+      draft.push({label: "notifyMethodCall", payload: event});
     });
   };
 
