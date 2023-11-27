@@ -4,6 +4,7 @@ export type IncomingEvents = {
   error: string;
   register: RegisterInstance;
   notifyValueChange: NotifyValueChange;
+  notifyMethodCall: NotifyMethodCall;
 };
 
 /**
@@ -18,6 +19,13 @@ export type RegisterInstance = {
   instanceType: string;
   properties: PropertyInfo[];
   registeredAt: number;
+}
+
+export type NotifyMethodCall = {
+  instanceUUID: string;
+  methodName: string;
+  methodCallUUID: string;
+  calledAt: number;
 }
 
 export type NotifyValueChange = {

@@ -42,6 +42,12 @@ export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
     });
   });
 
+  client.onMessage("notifyMethodCall", (event) => {
+    rawEventLog.update((draft) => {
+      draft.push("notifyMethodCall: " + JSON.stringify(event))
+    });
+  });
+
   function forceSetState(instanceId: string, propertyKey: string, value: string, valueType: string) {
     client.send("forceSetPropertyValue", {
       instanceUUID: instanceId,
