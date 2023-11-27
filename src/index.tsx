@@ -20,14 +20,14 @@ export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
   client.onMessage("notifyValueChange", actions.notifyValueChange);
   client.onMessage("notifyMethodCall", actions.notifyMethodCall);
 
-  function forceSetState(instanceId: string, propertyKey: string, value: string, valueType: string) {
+  const forceSetState = (instanceId: string, propertyKey: string, value: string, valueType: string) => {
     client.send("forceSetPropertyValue", {
       instanceUUID: instanceId,
       propertyName: propertyKey,
       value: value,
       valueType: valueType,
     });
-  }
+  };
 
   const refreshInstanceAliveStatus = (instanceUUIDs: string[]) => {
     if (instanceUUIDs.length == 0) return;
@@ -40,7 +40,7 @@ export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
           });
         });
       });
-  }
+  };
 
   return {
     registeredInstanceInfo: state.registeredInstances,
