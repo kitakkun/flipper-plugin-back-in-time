@@ -84,13 +84,21 @@ export type SelectedProperty = {
 // API: https://fbflipper.com/docs/extending/flipper-plugin#react-hooks
 export function Component() {
   const instance = usePlugin(plugin);
-  const registeredInfo = useValue(instance.registeredInstanceInfo);
-  const forceSetState = instance.forceSetState;
-  const valueChangeLog = useValue(instance.valueChangeLog);
 
+  // data stored in PluginClient
+  const registeredInfo = useValue(instance.registeredInstanceInfo);
+  const valueChangeLog = useValue(instance.valueChangeLog);
+  const rawEventLog = useValue(instance.rawEventLog)
+
+  // method to send message to mobile app
+  const refreshInstanceAliveStatus = instance.refreshInstanceAliveStatus;
+  const forceSetState = instance.forceSetState;
+
+  // state for UI
   const [selectedProperty, setSelectedProperty] = React.useState<SelectedProperty | null>(null);
   const [selectedInstance, setSelectedInstance] = React.useState<DebuggableStateHolderInfo | null>(null);
   const [selectedPropertyValueChangeLog, setSelectedPropertyValueChangeLog] = React.useState<NotifyValueChange[]>([]);
+  const [activeTabIndex, setActiveTabIndex] = React.useState(0);
 
   useEffect(() => {
     const instanceUUID = selectedProperty?.instanceUUID;
@@ -99,10 +107,6 @@ export function Component() {
     setSelectedInstance(selectedInstance ? selectedInstance : null);
     setSelectedPropertyValueChangeLog(valueChangeLog[instanceUUID].filter((event) => event.propertyName == selectedProperty.propertyName));
   }, [selectedProperty, valueChangeLog])
-
-  const refreshInstanceAliveStatus = instance.refreshInstanceAliveStatus;
-  const rawEventLog = useValue(instance.rawEventLog)
-  const [activeTabIndex, setActiveTabIndex] = React.useState(0);
 
   return (
     <>
