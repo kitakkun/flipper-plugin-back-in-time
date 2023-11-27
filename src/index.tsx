@@ -4,49 +4,21 @@ import InstanceList from "./components/InstanceList";
 import {DebuggableStateHolderInfo} from "./data/RegisterInstance";
 import PropertyInspector from "./components/PropertyInspector";
 import {IncomingEvents, NotifyValueChange} from "./events/FlipperIncomingEvents";
-import {OutgoingEvents} from "./events/FlipperOutgoingEvents";
+import {ForceSetPropertyValue, OutgoingEvents} from "./events/FlipperOutgoingEvents";
 import {Box, Tab, Tabs} from "@mui/material";
+import MyTabs from "./components/MyTabs";
+import useViewModel from "./ViewModel";
 
 // Read more: https://fbflipper.com/docs/tutorial/js-custom#creating-a-first-plugin
 // API: https://fbflipper.com/docs/extending/flipper-plugin#pluginclient
 export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
-  const registeredInstances = createState<DebuggableStateHolderInfo[]>([], {persist: 'registrationInfo'});
-  const valueChangeLog = createState<Record<string, NotifyValueChange[]>>({}, {persist: 'valueChangeLog'});
-  const rawEventLog = createState<string[]>([], {persist: 'rawEventLog'});
+  const viewModel = useViewModel();
+  const state = viewModel.state;
+  const actions = viewModel.actions;
 
-  client.onMessage("register", (event) => {
-    rawEventLog.update((draft) => {
-      draft.push("register: " + JSON.stringify(event))
-    });
-    registeredInstances.update((draft) => {
-      draft.push({
-        instanceUUID: event.instanceUUID,
-        instanceType: event.instanceType,
-        properties: event.properties,
-        registeredAt: event.registeredAt,
-        alive: true,
-      });
-    });
-    valueChangeLog.update((draft) => {
-      draft[event.instanceUUID] = [];
-    });
-  });
-
-  client.onMessage("notifyValueChange", (event) => {
-    rawEventLog.update((draft) => {
-      draft.push("notifyValueChange: " + JSON.stringify(event))
-    });
-    valueChangeLog.update((draft) => {
-      if (!draft[event.instanceUUID]) draft[event.instanceUUID] = [];
-      draft[event.instanceUUID].push(event);
-    });
-  });
-
-  client.onMessage("notifyMethodCall", (event) => {
-    rawEventLog.update((draft) => {
-      draft.push("notifyMethodCall: " + JSON.stringify(event))
-    });
-  });
+  client.onMessage("register", actions.register);
+  client.onMessage("notifyValueChange", actions.notifyValueChange);
+  client.onMessage("notifyMethodCall", actions.notifyMethodCall);
 
   function forceSetState(instanceId: string, propertyKey: string, value: string, valueType: string) {
     client.send("forceSetPropertyValue", {
@@ -62,17 +34,21 @@ export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
     client
       .send("refreshInstanceAliveStatus", {instanceUUIDs: instanceUUIDs})
       .then((response) => {
-        registeredInstances.update((draft) => {
+        state.registeredInstances.update((draft) => {
           Object.entries(response.isAlive).forEach(([instanceUUID, alive]) => {
-            const index = draft.findIndex((info) => info.instanceUUID == instanceUUID);
-            if (index == -1) return;
-            draft[index].alive = alive;
+            actions.updateInstanceAliveStatus(instanceUUID, alive);
           });
         });
       });
   }
 
-  return {registeredInstanceInfo: registeredInstances, forceSetState, valueChangeLog, refreshInstanceAliveStatus, rawEventLog};
+  return {
+    registeredInstanceInfo: state.registeredInstances,
+    valueChangeLog: state.valueChangeLog,
+    rawEventLog: state.rawEventLog,
+    forceSetState,
+    refreshInstanceAliveStatus,
+  };
 }
 
 export type SelectedProperty = {
