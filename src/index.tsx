@@ -1,13 +1,13 @@
 import React, {useEffect} from 'react';
 import {createState, DetailSidebar, Layout, PluginClient, usePlugin, useValue} from 'flipper-plugin';
-import InstanceList from "./components/InstanceList";
+import RegisteredInstancePage from "./page/registered_instance/RegisteredInstancePage";
 import {DebuggableStateHolderInfo} from "./data/RegisterInstance";
-import PropertyInspector from "./components/PropertyInspector";
+import PropertyInspector from "./sidebar/PropertyInspector";
 import {IncomingEvents, NotifyValueChange} from "./events/FlipperIncomingEvents";
 import {ForceSetPropertyValue, OutgoingEvents} from "./events/FlipperOutgoingEvents";
 import {Box, Tab, Tabs} from "@mui/material";
-import MyTabs from "./components/MyTabs";
 import useViewModel from "./ViewModel";
+import RawLogPage from "./page/raw_logs/RawLogPage";
 
 // Read more: https://fbflipper.com/docs/tutorial/js-custom#creating-a-first-plugin
 // API: https://fbflipper.com/docs/extending/flipper-plugin#pluginclient
@@ -96,9 +96,9 @@ export function Component() {
         </Box>
         {
           activeTabIndex == 0 ?
-            <InstanceList
+            <RegisteredInstancePage
               instances={registeredInfo}
-              onSelectedProperty={(instanceUUID, propertyName) => {
+              onSelectProperty={(instanceUUID, propertyName) => {
                 setSelectedProperty({instanceUUID: instanceUUID, propertyName: propertyName});
               }}
               onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.instanceUUID))}
@@ -106,12 +106,7 @@ export function Component() {
             /> : null
         }
         {
-          activeTabIndex == 1 ?
-            <Box padding={2}>
-              <ul>
-                {rawEventLog.map((log, index) => <li key={index}>{log}</li>)}
-              </ul>
-            </Box> : null
+          activeTabIndex == 1 ? <RawLogPage rawEventLog={rawEventLog}/> : null
         }
       </Layout.ScrollContainer>
       <DetailSidebar width={600}>
