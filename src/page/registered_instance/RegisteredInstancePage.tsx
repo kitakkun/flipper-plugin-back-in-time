@@ -10,12 +10,12 @@ type InstanceListProps = {
   instances: DebuggableStateHolderInfo[];
   onSelectProperty: (instanceUUID: string, propertyName: string) => void;
   onClickRefresh: () => void;
-  valueChangedEvents: Record<string, NotifyValueChange[]>;
+  valueChangedEvents: NotifyValueChange[];
 }
 
 export default function RegisteredInstancePage({instances, onSelectProperty, onClickRefresh, valueChangedEvents}: InstanceListProps) {
   const eventsByInstance = (instanceUUID: string) => {
-    const events = valueChangedEvents[instanceUUID];
+    const events = valueChangedEvents.filter((event) => event.instanceUUID == instanceUUID);
     if (!events) return [];
     return events;
   }

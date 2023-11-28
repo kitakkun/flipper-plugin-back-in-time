@@ -1,18 +1,25 @@
 // Read more: https://fbflipper.com/docs/tutorial/js-custom#creating-a-first-plugin
 // API: https://fbflipper.com/docs/extending/flipper-plugin#pluginclient
 import {PluginClient} from "flipper-plugin";
-import useViewModel from "./ViewModel";
 import {IncomingEvents} from "./events/FlipperIncomingEvents";
 import {OutgoingEvents} from "./events/FlipperOutgoingEvents";
+import {configureStore} from "@reduxjs/toolkit";
+import {flipperReducer, flipperActions} from "./flipperReducer";
+import {appReducer} from "./appReducer";
 
 export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
-  const viewModel = useViewModel();
-  const state = viewModel.state;
-  const actions = viewModel.actions;
+  const store = configureStore({
+    reducer: {
+      app: appReducer,
+      flipper: flipperReducer,
+    },
+  });
 
-  client.onMessage("register", actions.register);
-  client.onMessage("notifyValueChange", actions.notifyValueChange);
-  client.onMessage("notifyMethodCall", actions.notifyMethodCall);
+  const dispatch = store.dispatch;
+
+  client.onMessage("register", (event) => dispatch(flipperActions.registerInstance(event)));
+  client.onMessage("notifyValueChange", (event) => dispatch(flipperActions.notifyValueChange(event)));
+  client.onMessage("notifyMethodCall", (event) => dispatch(flipperActions.notifyMethodCall(event)));
 
   const forceSetState = (instanceId: string, propertyKey: string, value: string, valueType: string) => {
     client.send("forceSetPropertyValue", {
@@ -27,16 +34,11 @@ export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
     if (instanceUUIDs.length == 0) return;
     client
       .send("refreshInstanceAliveStatus", {instanceUUIDs: instanceUUIDs})
-      .then((response) => {
-        Object.entries(response.isAlive).forEach(([instanceUUID, alive]) => {
-          actions.updateInstanceAliveStatus(instanceUUID, alive);
-        });
-      });
+      .then((response) => dispatch(flipperActions.updateInstanceAliveStatus(response)));
   };
 
   return {
-    state,
-    actions,
+    store,
     forceSetState,
     refreshInstanceAliveStatus,
   };

@@ -6,26 +6,27 @@ import {plugin} from "./index";
 import TabMenu from "./component/TabMenu";
 import BackInTimeSideBar from "./BackInTimeSideBar";
 import TabContent from "./component/TabContent";
+import {Provider, shallowEqual, useDispatch, useSelector} from "react-redux";
+import {appActions, AppState, selectActiveTabIndex} from "./appReducer";
 
 export default () => {
   const pluginInstance = usePlugin(plugin);
-  const state = pluginInstance.state;
-  const actions = pluginInstance.actions;
-
-  const activeTabIndex = useValue(state.activeTabIndex);
+  const activeTabIndex = useSelector(selectActiveTabIndex);
+  const dispatch = useDispatch();
 
   return (
     <>
       <Layout.ScrollContainer>
-        <TabMenu activeTabIndex={activeTabIndex} onTabChange={actions.updateActiveTabIndex}/>
+        <TabMenu
+          activeTabIndex={activeTabIndex}
+          onTabChange={(newIndex) => dispatch(appActions.updateActiveTabIndex(newIndex))}
+        />
         <TabContent
           activeTabIndex={activeTabIndex}
-          state={state}
-          actions={actions}
           refreshInstanceAliveStatus={pluginInstance.refreshInstanceAliveStatus}
         />
       </Layout.ScrollContainer>
-      <BackInTimeSideBar state={state}/>
+      <BackInTimeSideBar />
     </>
   );
 }

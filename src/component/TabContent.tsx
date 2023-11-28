@@ -1,27 +1,27 @@
 import RegisteredInstancePage from "../page/registered_instance/RegisteredInstancePage";
 import RawLogPage from "../page/raw_logs/RawLogPage";
 import React from "react";
-import {Actions, State} from "../ViewModel";
-import {useValue} from "flipper-plugin";
+import {useDispatch, useSelector} from "react-redux";
+import {selectRawEvents, selectRegisteredInstances, selectValueChanges} from "../flipperReducer";
+import {appActions} from "../appReducer";
 
 type TabContentProps = {
   activeTabIndex: number;
-  state: State;
-  actions: Actions;
   refreshInstanceAliveStatus: (instanceUUIDs: string[]) => void;
 };
 
-export default ({activeTabIndex, state, actions, refreshInstanceAliveStatus}: TabContentProps) => {
-  const registeredInfo = useValue(state.registeredInstances);
-  const valueChangeLog = useValue(state.valueChangeLog);
-  const rawEventLog = useValue(state.rawEventLog);
+export default ({activeTabIndex, refreshInstanceAliveStatus}: TabContentProps) => {
+  const registeredInfo = useSelector(selectRegisteredInstances);
+  const valueChangeLog = useSelector(selectValueChanges);
+  const rawEventLog = useSelector(selectRawEvents);
+  const dispatch = useDispatch();
 
   switch (activeTabIndex) {
     case 0:
       return <RegisteredInstancePage
         instances={registeredInfo}
         onSelectProperty={(instanceUUID, propertyName) => {
-          actions.selectProperty(instanceUUID, propertyName);
+          dispatch(appActions.selectProperty({instanceUUID, propertyName}))
         }}
         onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.instanceUUID))}
         valueChangedEvents={valueChangeLog}
