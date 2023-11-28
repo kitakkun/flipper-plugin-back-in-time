@@ -26,7 +26,9 @@ export default () => {
           refreshInstanceAliveStatus={pluginInstance.refreshInstanceAliveStatus}
         />
       </Layout.ScrollContainer>
-      <BackInTimeSideBar />
+      <BackInTimeSideBar
+        emitValue={pluginInstance.forceSetState}
+      />
     </>
   );
 }

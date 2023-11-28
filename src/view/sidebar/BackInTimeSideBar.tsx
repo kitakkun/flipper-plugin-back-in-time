@@ -5,7 +5,11 @@ import {useSelector} from "react-redux";
 import {selectRegisteredInstances, selectValueChanges} from "../../reducer/flipperReducer";
 import {selectSelectedInstanceUUID, selectSelectedPropertyName} from "../../reducer/appReducer";
 
-export default () => {
+type BackInTimeSideBarProps = {
+  emitValue: (instanceUUID: string, propertyName: string, value: string, valueType: string) => void;
+}
+
+export default ({emitValue}: BackInTimeSideBarProps) => {
   const instances = useSelector(selectRegisteredInstances);
   const valueChanges = useSelector(selectValueChanges);
   const selectedPropertyName = useSelector(selectSelectedPropertyName);
@@ -20,7 +24,9 @@ export default () => {
         <PropertyInspector
           selectedInstance={selectedInstance}
           selectedPropertyName={selectedPropertyName}
-          selectedPropertyValueChangeLog={selectedPropertyValueChangeLog}/>
+          selectedPropertyValueChangeLog={selectedPropertyValueChangeLog}
+          onValueEmit={emitValue}
+        />
         : null
       }
     </DetailSidebar>
