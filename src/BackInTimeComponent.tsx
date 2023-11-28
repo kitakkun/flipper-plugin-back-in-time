@@ -5,11 +5,11 @@ import {DebuggableStateHolderInfo} from "./data/RegisterInstance";
 import {NotifyValueChange} from "./events/FlipperIncomingEvents";
 import {useEffect} from "react";
 import React from "react";
-import {Box, Tab, Tabs} from "@mui/material";
 import RegisteredInstancePage from "./page/registered_instance/RegisteredInstancePage";
 import RawLogPage from "./page/raw_logs/RawLogPage";
 import PropertyInspector from "./sidebar/PropertyInspector";
 import {plugin} from "./index";
+import TabMenu from "./component/TabMenu";
 
 export type SelectedProperty = {
   instanceUUID: string;
@@ -45,13 +45,7 @@ export default () => {
   return (
     <>
       <Layout.ScrollContainer>
-        <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
-          <Tabs value={activeTabIndex} onChange={(_, index) => setActiveTabIndex(index)}
-                aria-label="basic tabs example">
-            <Tab label="Registered instances"/>
-            <Tab label="Raw event log"/>
-          </Tabs>
-        </Box>
+        <TabMenu activeTabIndex={activeTabIndex} onTabChange={setActiveTabIndex}/>
         {
           (() => {
             switch (activeTabIndex) {
