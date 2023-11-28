@@ -34,18 +34,14 @@ export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
     client
       .send("refreshInstanceAliveStatus", {instanceUUIDs: instanceUUIDs})
       .then((response) => {
-        state.registeredInstances.update((draft) => {
-          Object.entries(response.isAlive).forEach(([instanceUUID, alive]) => {
-            actions.updateInstanceAliveStatus(instanceUUID, alive);
-          });
+        Object.entries(response.isAlive).forEach(([instanceUUID, alive]) => {
+          actions.updateInstanceAliveStatus(instanceUUID, alive);
         });
       });
   };
 
   return {
-    registeredInstanceInfo: state.registeredInstances,
-    valueChangeLog: state.valueChangeLog,
-    rawEventLog: state.rawEventLog,
+    ...state,
     forceSetState,
     refreshInstanceAliveStatus,
   };
@@ -62,7 +58,7 @@ export function Component() {
   const instance = usePlugin(plugin);
 
   // data stored in PluginClient
-  const registeredInfo = useValue(instance.registeredInstanceInfo);
+  const registeredInfo = useValue(instance.registeredInstances);
   const valueChangeLog = useValue(instance.valueChangeLog);
   const rawEventLog = useValue(instance.rawEventLog)
 
