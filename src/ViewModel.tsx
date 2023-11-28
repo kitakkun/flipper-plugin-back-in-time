@@ -2,6 +2,8 @@ import {DebuggableStateHolderInfo} from "./data/RegisterInstance";
 import {Atom, createState} from "flipper-plugin";
 import {NotifyMethodCall, NotifyValueChange, RegisterInstance} from "./events/FlipperIncomingEvents";
 import {RawEventLog} from "./data/RawEventLog";
+import {useEffect} from "react";
+import {PropertySelection} from "./data/PropertySelection";
 
 export type State = {
   registeredInstances: Atom<DebuggableStateHolderInfo[]>
@@ -35,9 +37,26 @@ export default function useViewModel(): ViewModel {
   const rawEventLog = createState<RawEventLog[]>([], {persist: 'rawEventLog'});
 
   const activeTabIndex = createState<number>(0);
-  const selectedProperty = createState<string | null>(null);
+  const selectedPropertyName = createState<string | null>(null);
   const selectedInstance = createState<DebuggableStateHolderInfo | null>(null);
   const selectedPropertyValueChangeLog = createState<NotifyValueChange[]>([]);
+  const propertySelection = createState<PropertySelection | null>(null);
+
+  propertySelection.subscribe((selection) => {
+    if (!selection) return;
+    const {instanceUUID, propertyName} = selection;
+    const instance = registeredInstances.get().find((info) => info.instanceUUID == instanceUUID);
+    selectedInstance.set(instance ? instance : null);
+    selectedPropertyName.set(propertyName);
+    selectedPropertyValueChangeLog.set(valueChangeLog.get()[instanceUUID].filter((event) => event.propertyName == propertyName) || []);
+  });
+
+  valueChangeLog.subscribe((log) => {
+    const selection = propertySelection.get();
+    if (!selection) return;
+    const {instanceUUID, propertyName} = selection;
+    selectedPropertyValueChangeLog.set(log[instanceUUID].filter((event) => event.propertyName == propertyName) || []);
+  });
 
   const register = (event: RegisterInstance) => {
     rawEventLog.update((draft) => {
@@ -86,10 +105,7 @@ export default function useViewModel(): ViewModel {
   }
 
   const selectProperty = (instanceUUID: string, propertyName: string) => {
-    selectedProperty.set(propertyName);
-    const instance = registeredInstances.get().find((info) => info.instanceUUID == instanceUUID);
-    selectedInstance.set(instance ? instance : null);
-    selectedPropertyValueChangeLog.set(valueChangeLog.get()[instanceUUID].filter((event) => event.propertyName == propertyName));
+    propertySelection.set({instanceUUID, propertyName});
   }
 
   return {
@@ -97,7 +113,7 @@ export default function useViewModel(): ViewModel {
       registeredInstances,
       valueChangeLog,
       rawEventLog,
-      selectedPropertyName: selectedProperty,
+      selectedPropertyName,
       selectedInstance,
       selectedPropertyValueChangeLog,
       activeTabIndex,
