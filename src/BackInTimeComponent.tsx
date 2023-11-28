@@ -42,29 +42,29 @@ export default () => {
     setSelectedPropertyValueChangeLog(valueChangeLog[instanceUUID].filter((event) => event.propertyName == selectedProperty.propertyName));
   }, [selectedProperty, valueChangeLog])
 
+  const TabContent = (activeTabIndex: number) => {
+    switch (activeTabIndex) {
+      case 0:
+        return <RegisteredInstancePage
+          instances={registeredInfo}
+          onSelectProperty={(instanceUUID, propertyName) => {
+            setSelectedProperty({instanceUUID: instanceUUID, propertyName: propertyName});
+          }}
+          onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.instanceUUID))}
+          valueChangedEvents={valueChangeLog}
+        />
+      case 1:
+        return <RawLogPage rawEventLog={rawEventLog}/>
+      default:
+        return null;
+    }
+  }
+
   return (
     <>
       <Layout.ScrollContainer>
         <TabMenu activeTabIndex={activeTabIndex} onTabChange={setActiveTabIndex}/>
-        {
-          (() => {
-            switch (activeTabIndex) {
-              case 0:
-                return <RegisteredInstancePage
-                  instances={registeredInfo}
-                  onSelectProperty={(instanceUUID, propertyName) => {
-                    setSelectedProperty({instanceUUID: instanceUUID, propertyName: propertyName});
-                  }}
-                  onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.instanceUUID))}
-                  valueChangedEvents={valueChangeLog}
-                />
-              case 1:
-                return <RawLogPage rawEventLog={rawEventLog}/>
-              default:
-                return null;
-            }
-          })()
-        }
+        {TabContent(activeTabIndex)}
       </Layout.ScrollContainer>
       <DetailSidebar width={600}>
         {selectedProperty && selectedInstance ?
