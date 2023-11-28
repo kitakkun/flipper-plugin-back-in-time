@@ -9,6 +9,7 @@ export type State = {
   valueChangeLog: Atom<Record<string, NotifyValueChange[]>>
   rawEventLog: Atom<RawEventLog[]>
   // ui state
+  activeTabIndex: Atom<number>,
   selectedInstance: Atom<DebuggableStateHolderInfo | null>
   selectedPropertyName: Atom<string | null>
   selectedPropertyValueChangeLog: Atom<NotifyValueChange[]>
@@ -21,6 +22,7 @@ export type Actions = {
   updateInstanceAliveStatus: (instanceUUID: string, alive: boolean) => void;
 
   selectProperty: (instanceUUID: string, propertyName: string) => void;
+  updateActiveTabIndex: (index: number) => void;
 };
 
 type ViewModel = {
@@ -33,6 +35,7 @@ export default function useViewModel(): ViewModel {
   const valueChangeLog = createState<Record<string, NotifyValueChange[]>>({}, {persist: 'valueChangeLog'});
   const rawEventLog = createState<RawEventLog[]>([], {persist: 'rawEventLog'});
 
+  const activeTabIndex = createState<number>(0);
   const selectedProperty = createState<string | null>(null);
   const selectedInstance = createState<DebuggableStateHolderInfo | null>(null);
   const selectedPropertyValueChangeLog = createState<NotifyValueChange[]>([]);
@@ -79,6 +82,10 @@ export default function useViewModel(): ViewModel {
     });
   };
 
+  const updateActiveTabIndex = (index: number) => {
+    activeTabIndex.set(index);
+  }
+
   const selectProperty = (instanceUUID: string, propertyName: string) => {
     selectedProperty.set(propertyName);
     const instance = registeredInstances.get().find((info) => info.instanceUUID == instanceUUID);
@@ -94,6 +101,7 @@ export default function useViewModel(): ViewModel {
       selectedPropertyName: selectedProperty,
       selectedInstance,
       selectedPropertyValueChangeLog,
+      activeTabIndex,
     },
     actions: {
       register,
@@ -101,6 +109,7 @@ export default function useViewModel(): ViewModel {
       notifyMethodCall,
       updateInstanceAliveStatus,
       selectProperty,
-    }
+      updateActiveTabIndex,
+    },
   }
 }
