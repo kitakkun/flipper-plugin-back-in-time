@@ -1,10 +1,4 @@
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  List,
-  ListItemText
-} from "@mui/material";
+import {Accordion, AccordionDetails, AccordionSummary, List, ListItemText} from "@mui/material";
 import React from "react";
 import {theme} from "flipper-plugin";
 import {ExpandMore} from "@mui/icons-material";

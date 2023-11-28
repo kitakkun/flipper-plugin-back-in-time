@@ -4,7 +4,7 @@ import {PluginClient} from "flipper-plugin";
 import {IncomingEvents} from "./events/FlipperIncomingEvents";
 import {OutgoingEvents} from "./events/FlipperOutgoingEvents";
 import {configureStore} from "@reduxjs/toolkit";
-import {flipperReducer, flipperActions} from "./flipperReducer";
+import {flipperActions, flipperReducer} from "./flipperReducer";
 import {appReducer} from "./appReducer";
 
 export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {

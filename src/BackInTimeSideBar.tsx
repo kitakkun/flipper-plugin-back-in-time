@@ -1,4 +1,4 @@
-import {DetailSidebar, useValue} from "flipper-plugin";
+import {DetailSidebar} from "flipper-plugin";
 import PropertyInspector from "./sidebar/PropertyInspector";
 import React from "react";
 import {useSelector} from "react-redux";
