@@ -95,18 +95,23 @@ export function Component() {
           </Tabs>
         </Box>
         {
-          activeTabIndex == 0 ?
-            <RegisteredInstancePage
-              instances={registeredInfo}
-              onSelectProperty={(instanceUUID, propertyName) => {
-                setSelectedProperty({instanceUUID: instanceUUID, propertyName: propertyName});
-              }}
-              onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.instanceUUID))}
-              valueChangedEvents={valueChangeLog}
-            /> : null
-        }
-        {
-          activeTabIndex == 1 ? <RawLogPage rawEventLog={rawEventLog}/> : null
+          (() => {
+            switch (activeTabIndex) {
+              case 0:
+                return <RegisteredInstancePage
+                  instances={registeredInfo}
+                  onSelectProperty={(instanceUUID, propertyName) => {
+                    setSelectedProperty({instanceUUID: instanceUUID, propertyName: propertyName});
+                  }}
+                  onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.instanceUUID))}
+                  valueChangedEvents={valueChangeLog}
+                />
+              case 1:
+                return <RawLogPage rawEventLog={rawEventLog}/>
+              default:
+                return null;
+            }
+          })()
         }
       </Layout.ScrollContainer>
       <DetailSidebar width={600}>
