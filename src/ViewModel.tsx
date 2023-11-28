@@ -2,7 +2,6 @@ import {DebuggableStateHolderInfo} from "./data/RegisterInstance";
 import {Atom, createState} from "flipper-plugin";
 import {NotifyMethodCall, NotifyValueChange, RegisterInstance} from "./events/FlipperIncomingEvents";
 import {RawEventLog} from "./data/RawEventLog";
-import {SelectedProperty} from "./BackInTimeComponent";
 
 export type State = {
   registeredInstances: Atom<DebuggableStateHolderInfo[]>

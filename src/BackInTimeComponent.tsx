@@ -7,11 +7,6 @@ import TabMenu from "./component/TabMenu";
 import BackInTimeSideBar from "./BackInTimeSideBar";
 import TabContent from "./component/TabContent";
 
-export type SelectedProperty = {
-  instanceUUID: string;
-  propertyName: string;
-}
-
 export default () => {
   const pluginInstance = usePlugin(plugin);
   const state = pluginInstance.state;
