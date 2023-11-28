@@ -1,9 +1,9 @@
 import {DetailSidebar} from "flipper-plugin";
-import PropertyInspector from "./sidebar/PropertyInspector";
+import PropertyInspector from "./PropertyInspector";
 import React from "react";
 import {useSelector} from "react-redux";
-import {selectRegisteredInstances, selectValueChanges} from "./flipperReducer";
-import {selectSelectedInstanceUUID, selectSelectedPropertyName} from "./appReducer";
+import {selectRegisteredInstances, selectValueChanges} from "../../reducer/flipperReducer";
+import {selectSelectedInstanceUUID, selectSelectedPropertyName} from "../../reducer/appReducer";
 
 export default () => {
   const instances = useSelector(selectRegisteredInstances);

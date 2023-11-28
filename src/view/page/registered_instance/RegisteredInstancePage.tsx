@@ -3,8 +3,8 @@ import React from "react";
 import InstanceItem from "./InstanceItem";
 import {Refresh} from "@mui/icons-material";
 
-import {NotifyValueChange} from "../../events/FlipperIncomingEvents";
-import {DebuggableStateHolderInfo} from "../../data/RegisterInstance";
+import {NotifyValueChange} from "../../../events/FlipperIncomingEvents";
+import {DebuggableStateHolderInfo} from "../../../data/RegisterInstance";
 
 type InstanceListProps = {
   instances: DebuggableStateHolderInfo[];

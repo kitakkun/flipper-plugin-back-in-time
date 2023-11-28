@@ -1,8 +1,8 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {NotifyMethodCall, NotifyValueChange, RegisterInstance} from "./events/FlipperIncomingEvents";
-import {DebuggableStateHolderInfo} from "./data/RegisterInstance";
-import {CheckInstanceAliveResponse} from "./events/FlipperOutgoingEvents";
-import {RawEventLog} from "./data/RawEventLog";
+import {NotifyMethodCall, NotifyValueChange, RegisterInstance} from "../events/FlipperIncomingEvents";
+import {DebuggableStateHolderInfo} from "../data/RegisterInstance";
+import {CheckInstanceAliveResponse} from "../events/FlipperOutgoingEvents";
+import {RawEventLog} from "../data/RawEventLog";
 
 export type FlipperEvent = {
   registerInstance: DebuggableStateHolderInfo[];

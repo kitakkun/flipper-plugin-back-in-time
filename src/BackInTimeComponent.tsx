@@ -3,11 +3,11 @@
 import {Layout, usePlugin} from "flipper-plugin";
 import React from "react";
 import {plugin} from "./index";
-import TabMenu from "./component/TabMenu";
-import BackInTimeSideBar from "./BackInTimeSideBar";
-import TabContent from "./component/TabContent";
+import TabMenu from "./view/component/TabMenu";
+import BackInTimeSideBar from "./view/sidebar/BackInTimeSideBar";
+import TabContent from "./view/component/TabContent";
 import {useDispatch, useSelector} from "react-redux";
-import {appActions, selectActiveTabIndex} from "./appReducer";
+import {appActions, selectActiveTabIndex} from "./reducer/appReducer";
 
 export default () => {
   const pluginInstance = usePlugin(plugin);

@@ -1,6 +1,6 @@
 import {Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import React from "react";
-import {RawEventLog} from "../../data/RawEventLog";
+import {RawEventLog} from "../../../data/RawEventLog";
 
 type RawLogPageProps = {
   rawEventLog: RawEventLog[];

@@ -1,7 +1,7 @@
 import {Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
 import React from "react";
-import {DebuggableStateHolderInfo} from "../data/RegisterInstance";
-import {NotifyValueChange} from "../events/FlipperIncomingEvents";
+import {DebuggableStateHolderInfo} from "../../data/RegisterInstance";
+import {NotifyValueChange} from "../../events/FlipperIncomingEvents";
 
 type PropertyInspectorProps = {
   selectedInstance: DebuggableStateHolderInfo;

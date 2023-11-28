@@ -1,4 +1,4 @@
-import {NotifyValueChange} from "./events/FlipperIncomingEvents";
+import {NotifyValueChange} from "../events/FlipperIncomingEvents";
 import {createSlice} from "@reduxjs/toolkit";
 
 export interface AppState {

@@ -1,7 +1,7 @@
 import {Badge, ListItem, ListItemButton, ListItemText} from "@mui/material";
 import {theme} from "flipper-plugin";
 import React from "react";
-import {PropertyInfo} from "../../data/RegisterInstance";
+import {PropertyInfo} from "../../../data/RegisterInstance";
 
 type PropertyItemProps = {
   property: PropertyInfo;

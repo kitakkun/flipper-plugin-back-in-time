@@ -2,8 +2,8 @@ import RegisteredInstancePage from "../page/registered_instance/RegisteredInstan
 import RawLogPage from "../page/raw_logs/RawLogPage";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {selectRawEvents, selectRegisteredInstances, selectValueChanges} from "../flipperReducer";
-import {appActions} from "../appReducer";
+import {selectRawEvents, selectRegisteredInstances, selectValueChanges} from "../../reducer/flipperReducer";
+import {appActions} from "../../reducer/appReducer";
 
 type TabContentProps = {
   activeTabIndex: number;
