@@ -2,18 +2,25 @@ import {DebuggableStateHolderInfo} from "./data/RegisterInstance";
 import {Atom, createState} from "flipper-plugin";
 import {NotifyMethodCall, NotifyValueChange, RegisterInstance} from "./events/FlipperIncomingEvents";
 import {RawEventLog} from "./data/RawEventLog";
+import {SelectedProperty} from "./BackInTimeComponent";
 
-type State = {
+export type State = {
   registeredInstances: Atom<DebuggableStateHolderInfo[]>
   valueChangeLog: Atom<Record<string, NotifyValueChange[]>>
   rawEventLog: Atom<RawEventLog[]>
+  // ui state
+  selectedInstance: Atom<DebuggableStateHolderInfo | null>
+  selectedPropertyName: Atom<string | null>
+  selectedPropertyValueChangeLog: Atom<NotifyValueChange[]>
 };
 
-type Actions = {
+export type Actions = {
   register: (event: RegisterInstance) => void;
   notifyValueChange: (event: NotifyValueChange) => void;
   notifyMethodCall: (event: NotifyMethodCall) => void;
   updateInstanceAliveStatus: (instanceUUID: string, alive: boolean) => void;
+
+  selectProperty: (instanceUUID: string, propertyName: string) => void;
 };
 
 type ViewModel = {
@@ -25,6 +32,10 @@ export default function useViewModel(): ViewModel {
   const registeredInstances = createState<DebuggableStateHolderInfo[]>([], {persist: 'registrationInfo'});
   const valueChangeLog = createState<Record<string, NotifyValueChange[]>>({}, {persist: 'valueChangeLog'});
   const rawEventLog = createState<RawEventLog[]>([], {persist: 'rawEventLog'});
+
+  const selectedProperty = createState<string | null>(null);
+  const selectedInstance = createState<DebuggableStateHolderInfo | null>(null);
+  const selectedPropertyValueChangeLog = createState<NotifyValueChange[]>([]);
 
   const register = (event: RegisterInstance) => {
     rawEventLog.update((draft) => {
@@ -68,17 +79,28 @@ export default function useViewModel(): ViewModel {
     });
   };
 
+  const selectProperty = (instanceUUID: string, propertyName: string) => {
+    selectedProperty.set(propertyName);
+    const instance = registeredInstances.get().find((info) => info.instanceUUID == instanceUUID);
+    selectedInstance.set(instance ? instance : null);
+    selectedPropertyValueChangeLog.set(valueChangeLog.get()[instanceUUID].filter((event) => event.propertyName == propertyName));
+  }
+
   return {
     state: {
       registeredInstances,
       valueChangeLog,
       rawEventLog,
+      selectedPropertyName: selectedProperty,
+      selectedInstance,
+      selectedPropertyValueChangeLog,
     },
     actions: {
       register,
       notifyValueChange,
       notifyMethodCall,
       updateInstanceAliveStatus,
+      selectProperty,
     }
   }
 }

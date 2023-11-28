@@ -35,7 +35,8 @@ export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
   };
 
   return {
-    ...state,
+    state,
+    actions,
     forceSetState,
     refreshInstanceAliveStatus,
   };

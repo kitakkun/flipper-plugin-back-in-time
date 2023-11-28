@@ -10,6 +10,7 @@ import RawLogPage from "./page/raw_logs/RawLogPage";
 import PropertyInspector from "./sidebar/PropertyInspector";
 import {plugin} from "./index";
 import TabMenu from "./component/TabMenu";
+import BackInTimeSideBar from "./BackInTimeSideBar";
 
 export type SelectedProperty = {
   instanceUUID: string;
@@ -17,30 +18,17 @@ export type SelectedProperty = {
 }
 
 export default () => {
-  const instance = usePlugin(plugin);
+  const pluginInstance = usePlugin(plugin);
+  const state = pluginInstance.state;
+  const actions = pluginInstance.actions;
 
   // data stored in PluginClient
-  const registeredInfo = useValue(instance.registeredInstances);
-  const valueChangeLog = useValue(instance.valueChangeLog);
-  const rawEventLog = useValue(instance.rawEventLog)
-
-  // method to send message to mobile app
-  const refreshInstanceAliveStatus = instance.refreshInstanceAliveStatus;
-  const forceSetState = instance.forceSetState;
+  const registeredInfo = useValue(pluginInstance.state.registeredInstances);
+  const valueChangeLog = useValue(pluginInstance.state.valueChangeLog);
+  const rawEventLog = useValue(pluginInstance.state.rawEventLog)
 
   // state for UI
-  const [selectedProperty, setSelectedProperty] = React.useState<SelectedProperty | null>(null);
-  const [selectedInstance, setSelectedInstance] = React.useState<DebuggableStateHolderInfo | null>(null);
-  const [selectedPropertyValueChangeLog, setSelectedPropertyValueChangeLog] = React.useState<NotifyValueChange[]>([]);
   const [activeTabIndex, setActiveTabIndex] = React.useState(0);
-
-  useEffect(() => {
-    const instanceUUID = selectedProperty?.instanceUUID;
-    if (!instanceUUID) return;
-    const selectedInstance = registeredInfo.find((info) => info.instanceUUID == instanceUUID);
-    setSelectedInstance(selectedInstance ? selectedInstance : null);
-    setSelectedPropertyValueChangeLog(valueChangeLog[instanceUUID].filter((event) => event.propertyName == selectedProperty.propertyName));
-  }, [selectedProperty, valueChangeLog])
 
   const TabContent = (activeTabIndex: number) => {
     switch (activeTabIndex) {
@@ -48,9 +36,9 @@ export default () => {
         return <RegisteredInstancePage
           instances={registeredInfo}
           onSelectProperty={(instanceUUID, propertyName) => {
-            setSelectedProperty({instanceUUID: instanceUUID, propertyName: propertyName});
+            actions.selectProperty(instanceUUID, propertyName);
           }}
-          onClickRefresh={() => refreshInstanceAliveStatus(registeredInfo.map((info) => info.instanceUUID))}
+          onClickRefresh={() => pluginInstance.refreshInstanceAliveStatus(registeredInfo.map((info) => info.instanceUUID))}
           valueChangedEvents={valueChangeLog}
         />
       case 1:
@@ -66,15 +54,7 @@ export default () => {
         <TabMenu activeTabIndex={activeTabIndex} onTabChange={setActiveTabIndex}/>
         {TabContent(activeTabIndex)}
       </Layout.ScrollContainer>
-      <DetailSidebar width={600}>
-        {selectedProperty && selectedInstance ?
-          <PropertyInspector
-            selectedInstance={selectedInstance}
-            selectedProperty={selectedProperty}
-            selectedPropertyValueChangeLog={selectedPropertyValueChangeLog}/>
-          : null
-        }
-      </DetailSidebar>
+      <BackInTimeSideBar state={state}/>
     </>
   );
 }

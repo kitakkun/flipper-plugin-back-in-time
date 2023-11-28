@@ -1,23 +1,22 @@
 import {Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
 import React from "react";
-import {DebuggableStateHolderInfo, PropertyInfo} from "../data/RegisterInstance";
-import {SelectedProperty} from "../index";
+import {DebuggableStateHolderInfo} from "../data/RegisterInstance";
 import {NotifyValueChange} from "../events/FlipperIncomingEvents";
 
 type PropertyInspectorProps = {
   selectedInstance: DebuggableStateHolderInfo;
-  selectedProperty: SelectedProperty;
+  selectedPropertyName: string;
   selectedPropertyValueChangeLog: NotifyValueChange[];
 }
 
 export default function PropertyInspector(
   {
     selectedInstance,
-    selectedProperty,
+    selectedPropertyName,
     selectedPropertyValueChangeLog,
   }: PropertyInspectorProps
 ) {
-  const property = selectedInstance.properties.find((property) => property.name == selectedProperty.propertyName)
+  const property = selectedInstance.properties.find((property) => property.name == selectedPropertyName)
   return (
     <Box padding={2}>
       <Typography variant="subtitle1">
