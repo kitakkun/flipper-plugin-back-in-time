@@ -34,7 +34,7 @@
     "@types/jest": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "antd": "latest",
+    "antd": "^5.11.5",
     "flipper-pkg": "latest",
     "flipper-plugin": "latest",
     "jest": "latest",
