@@ -22,15 +22,17 @@ export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
 
   store.subscribe(() => {
     const pendingEvent = store.getState().flipper.pendingForceSetPropertyValueEvent
-    if (pendingEvent) {
-      client.send("forceSetPropertyValue", pendingEvent);
+    if (pendingEvent && !pendingEvent.sent) {
+      dispatch(flipperActions.sendForceSetPropertyValueEventCompleted());
+      client.send("forceSetPropertyValue", pendingEvent.payload);
     }
   });
 
   store.subscribe(() => {
     const pendingEvent = store.getState().flipper.pendingRefreshInstanceAliveStatusEvent
-    if (pendingEvent) {
-      client.send("refreshInstanceAliveStatus", pendingEvent)
+    if (pendingEvent && !pendingEvent.sent) {
+      dispatch(flipperActions.sendRefreshInstanceAliveStatusEventCompleted());
+      client.send("refreshInstanceAliveStatus", pendingEvent.payload)
         .then((response) => dispatch(flipperActions.updateInstanceAliveStatus(response)));
     }
   });

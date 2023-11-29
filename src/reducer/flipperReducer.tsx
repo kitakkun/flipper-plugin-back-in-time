@@ -3,14 +3,15 @@ import {NotifyMethodCall, NotifyValueChange, RegisterInstance} from "../events/F
 import {DebuggableStateHolderInfo} from "../data/RegisterInstance";
 import {CheckInstanceAlive, CheckInstanceAliveResponse, ForceSetPropertyValue} from "../events/FlipperOutgoingEvents";
 import {RawEventLog} from "../data/RawEventLog";
+import {FlipperPendingEvent} from "../events/FlipperPendingEvent";
 
 export type FlipperEvent = {
   registerInstance: DebuggableStateHolderInfo[];
   valueChanges: NotifyValueChange[];
   methodCalls: NotifyMethodCall[];
   rawEvents: RawEventLog[];
-  pendingForceSetPropertyValueEvent: ForceSetPropertyValue | null;
-  pendingRefreshInstanceAliveStatusEvent: CheckInstanceAlive | null;
+  pendingForceSetPropertyValueEvent: FlipperPendingEvent<ForceSetPropertyValue> | null;
+  pendingRefreshInstanceAliveStatusEvent: FlipperPendingEvent<CheckInstanceAlive> | null;
 }
 
 const initialState: FlipperEvent = {
@@ -47,12 +48,29 @@ const flipperEventSlice = createSlice({
         instance.alive = alive;
       });
     },
+
     sendForceSetPropertyValue: (state, action: PayloadAction<ForceSetPropertyValue>) => {
-      state.pendingForceSetPropertyValueEvent = action.payload;
+      state.pendingForceSetPropertyValueEvent = {
+        payload: action.payload,
+        sent: false,
+      };
     },
     sendRefreshInstanceAliveStatus: (state, action: PayloadAction<CheckInstanceAlive>) => {
-      state.pendingRefreshInstanceAliveStatusEvent = action.payload;
-    }
+      state.pendingRefreshInstanceAliveStatusEvent = {
+        payload: action.payload,
+        sent: false,
+      };
+    },
+    sendForceSetPropertyValueEventCompleted: (state) => {
+      if (state.pendingForceSetPropertyValueEvent) {
+        state.pendingForceSetPropertyValueEvent.sent = true;
+      }
+    },
+    sendRefreshInstanceAliveStatusEventCompleted: (state) => {
+      if (state.pendingRefreshInstanceAliveStatusEvent) {
+        state.pendingRefreshInstanceAliveStatusEvent.sent = true;
+      }
+    },
   }
 });
 
