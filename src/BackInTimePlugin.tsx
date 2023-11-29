@@ -16,30 +16,24 @@ export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
   });
 
   const dispatch = store.dispatch;
-
   client.onMessage("register", (event) => dispatch(flipperActions.registerInstance(event)));
   client.onMessage("notifyValueChange", (event) => dispatch(flipperActions.notifyValueChange(event)));
   client.onMessage("notifyMethodCall", (event) => dispatch(flipperActions.notifyMethodCall(event)));
 
-  const forceSetState = (instanceId: string, propertyKey: string, value: string, valueType: string) => {
-    client.send("forceSetPropertyValue", {
-      instanceUUID: instanceId,
-      propertyName: propertyKey,
-      value: value,
-      valueType: valueType,
-    });
-  };
+  store.subscribe(() => {
+    const pendingEvent = store.getState().flipper.pendingForceSetPropertyValueEvent
+    if (pendingEvent) {
+      client.send("forceSetPropertyValue", pendingEvent);
+    }
+  });
 
-  const refreshInstanceAliveStatus = (instanceUUIDs: string[]) => {
-    if (instanceUUIDs.length == 0) return;
-    client
-      .send("refreshInstanceAliveStatus", {instanceUUIDs: instanceUUIDs})
-      .then((response) => dispatch(flipperActions.updateInstanceAliveStatus(response)));
-  };
+  store.subscribe(() => {
+    const pendingEvent = store.getState().flipper.pendingRefreshInstanceAliveStatusEvent
+    if (pendingEvent) {
+      client.send("refreshInstanceAliveStatus", pendingEvent)
+        .then((response) => dispatch(flipperActions.updateInstanceAliveStatus(response)));
+    }
+  });
 
-  return {
-    store,
-    forceSetState,
-    refreshInstanceAliveStatus,
-  };
+  return {store};
 }

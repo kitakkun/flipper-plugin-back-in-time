@@ -1,7 +1,7 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {NotifyMethodCall, NotifyValueChange, RegisterInstance} from "../events/FlipperIncomingEvents";
 import {DebuggableStateHolderInfo} from "../data/RegisterInstance";
-import {CheckInstanceAliveResponse} from "../events/FlipperOutgoingEvents";
+import {CheckInstanceAlive, CheckInstanceAliveResponse, ForceSetPropertyValue} from "../events/FlipperOutgoingEvents";
 import {RawEventLog} from "../data/RawEventLog";
 
 export type FlipperEvent = {
@@ -9,6 +9,8 @@ export type FlipperEvent = {
   valueChanges: NotifyValueChange[];
   methodCalls: NotifyMethodCall[];
   rawEvents: RawEventLog[];
+  pendingForceSetPropertyValueEvent: ForceSetPropertyValue | null;
+  pendingRefreshInstanceAliveStatusEvent: CheckInstanceAlive | null;
 }
 
 const initialState: FlipperEvent = {
@@ -16,6 +18,8 @@ const initialState: FlipperEvent = {
   valueChanges: [],
   methodCalls: [],
   rawEvents: [],
+  pendingForceSetPropertyValueEvent: null,
+  pendingRefreshInstanceAliveStatusEvent: null,
 }
 
 const flipperEventSlice = createSlice({
@@ -42,6 +46,12 @@ const flipperEventSlice = createSlice({
         if (!instance) return;
         instance.alive = alive;
       });
+    },
+    sendForceSetPropertyValue: (state, action: PayloadAction<ForceSetPropertyValue>) => {
+      state.pendingForceSetPropertyValueEvent = action.payload;
+    },
+    sendRefreshInstanceAliveStatus: (state, action: PayloadAction<CheckInstanceAlive>) => {
+      state.pendingRefreshInstanceAliveStatusEvent = action.payload;
     }
   }
 });
