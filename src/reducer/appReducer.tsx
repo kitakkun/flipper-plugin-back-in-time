@@ -2,7 +2,7 @@ import {NotifyValueChange} from "../events/FlipperIncomingEvents";
 import {createSlice} from "@reduxjs/toolkit";
 
 export interface AppState {
-  activeTabIndex: number;
+  activeTabIndex: string;
   selectedInstanceUUID: string | null;
   selectedPropertyName: string | null;
   selectedPropertyValueChangeLog: NotifyValueChange[];
@@ -11,7 +11,7 @@ export interface AppState {
 const appSlice = createSlice({
   name: "app",
   initialState: {
-    activeTabIndex: 0,
+    activeTabIndex: '1',
     selectedInstanceUUID: null,
     selectedPropertyName: null,
     selectedPropertyValueChangeLog: [],
@@ -30,6 +30,6 @@ const appSlice = createSlice({
 export const appActions = appSlice.actions;
 export const appReducer = appSlice.reducer;
 
-export const selectActiveTabIndex = (state: any) => state.app.activeTabIndex;
+export const selectActiveTabIndex = (state: any) => state.app.activeTabIndex as string;
 export const selectSelectedInstanceUUID = (state: any) => state.app.selectedInstanceUUID as string | null;
 export const selectSelectedPropertyName = (state: any) => state.app.selectedPropertyName as string | null;
