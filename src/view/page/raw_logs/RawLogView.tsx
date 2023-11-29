@@ -1,32 +1,34 @@
-import {Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import React from "react";
 import {RawEventLog} from "../../../data/RawEventLog";
+import {Table} from "antd";
 
 type RawLogPageProps = {
   rawEventLog: RawEventLog[];
 }
 
 export function RawLogView({rawEventLog}: RawLogPageProps) {
+  const dataSource = rawEventLog.map((log, index) => {
+    return {
+      key: index,
+      label: log.label,
+      payload: JSON.stringify(log.payload),
+    }
+  });
+
+  const columns = [
+    {
+      title: 'label',
+      dataIndex: 'label',
+      key: 'label',
+    },
+    {
+      title: 'payload',
+      dataIndex: 'payload',
+      key: 'payload',
+    },
+  ];
+
   return (
-    <Box padding={2}>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableCell>label</TableCell>
-            <TableCell>payload</TableCell>
-          </TableHead>
-          <TableBody>
-            {rawEventLog.map((log, index) =>
-              <TableRow key={index}>
-                <TableCell>{log.label}</TableCell>
-                <TableCell>{JSON.stringify(log.payload)}</TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <ul>
-      </ul>
-    </Box>
+    <Table dataSource={dataSource} columns={columns} scroll={{x: true}}/>
   );
 }
