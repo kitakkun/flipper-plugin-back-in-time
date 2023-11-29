@@ -3,7 +3,8 @@ import {PluginClient} from "flipper-plugin";
 import {IncomingEvents} from "./events/FlipperIncomingEvents";
 import {OutgoingEvents} from "./events/FlipperOutgoingEvents";
 import React from "react";
-import BackInTimeComponentWrapper from "./BackInTimeComponentWrapper";
+import BackInTimeComponent from "./BackInTimeComponent";
+import {BackInTimeStoreProvider} from "./BackInTimeStoreProvider";
 
 export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
   return BackInTimePlugin(client);
@@ -11,6 +12,8 @@ export function plugin(client: PluginClient<IncomingEvents, OutgoingEvents>) {
 
 export function Component() {
   return (
-    <BackInTimeComponentWrapper/>
+    <BackInTimeStoreProvider>
+      <BackInTimeComponent/>
+    </BackInTimeStoreProvider>
   );
 }
