@@ -1,8 +1,7 @@
-import {Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography} from "@mui/material";
 import React from "react";
 import {NotifyValueChange} from "../../../events/FlipperIncomingEvents";
 import {DebuggableStateHolderInfo, PropertyInfo} from "../../../data/RegisterInstance";
-import {theme} from "flipper-plugin";
+import {Button, Table, Typography} from "antd";
 
 type TargetValueChangeTableProps = {
   instance: DebuggableStateHolderInfo;
@@ -18,45 +17,50 @@ export default ({instance, valueChanges, onClickEmitValue}: TargetValueChangeTab
   const onClick = (propertyInfo: PropertyInfo, valueChangeEvent: NotifyValueChange) => {
     onClickEmitValue(instance.instanceUUID, propertyInfo.name, valueChangeEvent.value, propertyInfo.valueType);
   }
+
+  const dataSource = valueChanges.map((valueChange) => {
+    const property = propertyInfo(valueChange.propertyName)!;
+    return {
+      action: <Button onClick={() => onClick(property, valueChange)}>Emit Value</Button>,
+      name: property.name,
+      type: property.propertyType,
+      valueType: property.valueType,
+      value: valueChange.value,
+    };
+  }).filter((value) => value != null);
+
+  const columns = [
+    {
+      title: 'action',
+      dataIndex: 'action',
+      key: 'action',
+    },
+    {
+      title: 'name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'type',
+      dataIndex: 'type',
+      key: 'type',
+    },
+    {
+      title: 'value type',
+      dataIndex: 'valueType',
+      key: 'valueType',
+    },
+    {
+      title: 'value',
+      dataIndex: 'value',
+      key: 'value',
+    },
+  ]
+
   return (
     <>
-      <Typography sx={{fontSize: theme.fontSize.default}}>Updated Properties</Typography>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>action</TableCell>
-              <TableCell>name</TableCell>
-              <TableCell>type</TableCell>
-              <TableCell>value type</TableCell>
-              <TableCell>value</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {
-              valueChanges.map((valueChange) => {
-                const property = propertyInfo(valueChange.propertyName);
-                if (!property) return null;
-                return (
-                  <TableRow>
-                    <TableCell>
-                      <Button variant={"contained"} onClick={() => {
-                        onClick(property, valueChange)
-                      }}>
-                        Emit Value
-                      </Button>
-                    </TableCell>
-                    <TableCell>{valueChange.propertyName}</TableCell>
-                    <TableCell>{property.propertyType}</TableCell>
-                    <TableCell>{property.valueType}</TableCell>
-                    <TableCell>{valueChange.value}</TableCell>
-                  </TableRow>
-                )
-              })
-            }
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <Typography.Title level={5}>Value Changes</Typography.Title>
+      <Table dataSource={dataSource} columns={columns} scroll={{x: true}}/>
     </>
   );
 }

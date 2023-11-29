@@ -1,6 +1,6 @@
 import React from "react";
-import {Modal} from "@mui/material";
 import {ValueEmitPage} from "./ValueEmitPage";
+import {Modal} from "antd";
 
 type ValueEmitModalProps = {
   open: boolean;
@@ -13,16 +13,15 @@ export default ({open, onClose, targetMethodCallId, instanceUUID}: ValueEmitModa
   return (
     <>
       <Modal
+        title={"Value Emitter"}
         open={open}
-        onClose={onClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        sx={{padding: 4, overflowY: "scroll"}}
+        footer={null}
+        onCancel={onClose}
+        width={"80%"}
       >
         <ValueEmitPage
           targetMethodCallId={targetMethodCallId}
           instanceUUID={instanceUUID}
-          onClose={onClose}
         />
       </Modal>
     </>

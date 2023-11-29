@@ -9,12 +9,11 @@ import React from "react";
 import {ValueEmitView} from "./ValueEmitView";
 
 type ValueEmitPageProps = {
-  onClose: () => void;
   targetMethodCallId: string;
   instanceUUID: string;
 };
 
-export function ValueEmitPage({onClose, targetMethodCallId, instanceUUID}: ValueEmitPageProps) {
+export function ValueEmitPage({targetMethodCallId, instanceUUID}: ValueEmitPageProps) {
   const instances = useSelector(selectRegisteredInstances);
   const methodCalls = useSelector(selectMethodCalls);
   const valueChanges = useSelector(selectValueChanges);
@@ -38,7 +37,6 @@ export function ValueEmitPage({onClose, targetMethodCallId, instanceUUID}: Value
     instance={targetInstance}
     methodCall={targetMethodCall}
     valueChanges={targetValueChange}
-    onClickClose={onClose}
     onValueEmit={(instanceUUID: string, propertyName: string, value: string, valueType: string) => {
       dispatch(flipperActions.sendForceSetPropertyValue({instanceUUID, propertyName, value, valueType}))
     }}
