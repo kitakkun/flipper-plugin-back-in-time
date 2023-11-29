@@ -8,7 +8,6 @@ type PropertyInspectorProps = {
   selectedInstance: DebuggableStateHolderInfo;
   selectedPropertyName: string;
   selectedPropertyValueChangeLog: NotifyValueChange[];
-  onValueEmit: (instanceUUID: string, propertyName: string, value: string, valueType: string) => void;
 }
 
 export default function PropertyInspector(
@@ -16,7 +15,6 @@ export default function PropertyInspector(
     selectedInstance,
     selectedPropertyName,
     selectedPropertyValueChangeLog,
-    onValueEmit,
   }: PropertyInspectorProps
 ) {
   const property = selectedInstance.properties.find((property) => property.name == selectedPropertyName)
@@ -30,7 +28,6 @@ export default function PropertyInspector(
         instanceUUID={selectedInstance.instanceUUID}
         open={open}
         onClose={() => setOpen(false)}
-        onValueEmit={onValueEmit}
       />
       <Box padding={2}>
         <Typography variant="subtitle1">

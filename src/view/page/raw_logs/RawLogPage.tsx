@@ -1,32 +1,10 @@
-import {Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
 import React from "react";
-import {RawEventLog} from "../../../data/RawEventLog";
+import {useSelector} from "react-redux";
+import {selectRawEvents} from "../../../reducer/flipperReducer";
+import {RawLogView} from "./RawLogView";
 
-type RawLogPageProps = {
-  rawEventLog: RawEventLog[];
-}
+export default function RawLogPage() {
+  const rawEventLog = useSelector(selectRawEvents);
 
-export default function RawLogPage({rawEventLog}: RawLogPageProps) {
-  return (
-    <Box padding={2}>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableCell>label</TableCell>
-            <TableCell>payload</TableCell>
-          </TableHead>
-          <TableBody>
-            {rawEventLog.map((log, index) =>
-              <TableRow key={index}>
-                <TableCell>{log.label}</TableCell>
-                <TableCell>{JSON.stringify(log.payload)}</TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <ul>
-      </ul>
-    </Box>
-  );
+  return <RawLogView rawEventLog={rawEventLog}/>;
 }
