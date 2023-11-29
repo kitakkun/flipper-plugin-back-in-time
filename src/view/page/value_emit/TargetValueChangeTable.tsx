@@ -2,6 +2,7 @@ import React from "react";
 import {NotifyValueChange} from "../../../events/FlipperIncomingEvents";
 import {DebuggableStateHolderInfo, PropertyInfo} from "../../../data/RegisterInstance";
 import {Button, Table, Typography} from "antd";
+import {EmitButton} from "./EmitButton";
 
 type TargetValueChangeTableProps = {
   instance: DebuggableStateHolderInfo;
@@ -21,7 +22,11 @@ export default ({instance, valueChanges, onClickEmitValue}: TargetValueChangeTab
   const dataSource = valueChanges.map((valueChange) => {
     const property = propertyInfo(valueChange.propertyName)!;
     return {
-      action: <Button onClick={() => onClick(property, valueChange)}>Emit Value</Button>,
+      action: <EmitButton
+        onClickEmitValue={() => onClick(property, valueChange)}
+        onClickEditValue={() => {/* TODO */
+        }}
+      />,
       name: property.name,
       type: property.propertyType,
       valueType: property.valueType,
