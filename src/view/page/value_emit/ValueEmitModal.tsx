@@ -17,7 +17,7 @@ export default ({open, onClose, targetMethodCallId, instanceUUID}: ValueEmitModa
         onClose={onClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
-        sx={{padding: 4}}
+        sx={{padding: 4, overflowY: "scroll"}}
       >
         <ValueEmitPage
           targetMethodCallId={targetMethodCallId}

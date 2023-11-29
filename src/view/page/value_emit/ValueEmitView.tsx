@@ -1,5 +1,5 @@
 import {Box, IconButton, Typography} from "@mui/material";
-import {theme} from "flipper-plugin";
+import {Layout, theme, Toolbar} from "flipper-plugin";
 import {Close} from "@mui/icons-material";
 import MethodCallInfo from "./MethodCallInfo";
 import TargetValueChangeTable from "./TargetValueChangeTable";
@@ -18,24 +18,27 @@ type ValueEmitViewProps = {
 export function ValueEmitView({onClickClose, onValueEmit, methodCall, instance, valueChanges}: ValueEmitViewProps) {
   return <Box
     bgcolor={theme.backgroundDefault}
-    borderRadius={4}
-    padding={2}
+    borderRadius={theme.borderRadius}
     sx={{width: "100%"}}
   >
-    <Typography sx={{fontSize: theme.fontSize.large}}>Value Emitter</Typography>
-    <IconButton onClick={onClickClose}>
-      <Close/>
-    </IconButton>
-    <MethodCallInfo
-      methodCallUUID={methodCall.methodCallUUID}
-      instanceUUID={methodCall.instanceUUID}
-      calledAt={methodCall.calledAt}
-      methodName={methodCall.methodName}
-    />
-    <TargetValueChangeTable
-      instance={instance}
-      valueChanges={valueChanges}
-      onClickEmitValue={onValueEmit}
-    />
+    <Toolbar>
+      <IconButton onClick={onClickClose}>
+        <Close/>
+      </IconButton>
+      <Typography sx={{fontSize: theme.fontSize.large}}>Value Emitter</Typography>
+    </Toolbar>
+    <Box padding={2}>
+      <MethodCallInfo
+        methodCallUUID={methodCall.methodCallUUID}
+        instanceUUID={methodCall.instanceUUID}
+        calledAt={methodCall.calledAt}
+        methodName={methodCall.methodName}
+      />
+      <TargetValueChangeTable
+        instance={instance}
+        valueChanges={valueChanges}
+        onClickEmitValue={onValueEmit}
+      />
+    </Box>
   </Box>;
 }
