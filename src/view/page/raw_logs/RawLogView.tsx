@@ -1,6 +1,7 @@
 import React from "react";
 import {RawEventLog} from "../../../data/RawEventLog";
 import {Table} from "antd";
+import {Layout, theme} from "flipper-plugin";
 
 type RawLogPageProps = {
   rawEventLog: RawEventLog[];
@@ -29,6 +30,8 @@ export function RawLogView({rawEventLog}: RawLogPageProps) {
   ];
 
   return (
-    <Table dataSource={dataSource} columns={columns} scroll={{x: true}}/>
+    <Layout.Container padv={theme.inlinePaddingV} padh={theme.inlinePaddingH} gap={theme.space.medium}>
+      <Table dataSource={dataSource} columns={columns} scroll={{x: true}}/>
+    </Layout.Container>
   );
 }
