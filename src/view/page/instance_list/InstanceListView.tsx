@@ -1,56 +1,52 @@
 import React from "react";
-
-import {NotifyValueChange} from "../../../events/FlipperIncomingEvents";
 import {DebuggableStateHolderInfo} from "../../../data/RegisterInstance";
-import {Badge, Button, Collapse, List, Row, Space, Switch, Typography} from "antd";
+import {Badge, Button, Collapse, List, Switch, Typography} from "antd";
 import {ReloadOutlined} from "@ant-design/icons";
 import {Layout, theme} from "flipper-plugin";
+import {InstanceListState} from "./InstanceListReducer";
 
 type InstanceListProps = {
-  instances: DebuggableStateHolderInfo[];
+  state: InstanceListState;
   onSelectProperty: (instanceUUID: string, propertyName: string) => void;
   onClickRefresh: () => void;
-  hideNonDebuggableProperties: boolean;
-  onHideNonDebuggablePropertiesCheckedChange: (checked: boolean) => void;
-  valueChangedEvents: NotifyValueChange[];
+  onChangeNonDebuggablePropertyVisible: (visible: boolean) => void;
 }
 
-export default function RegisteredInstanceView(
+export function InstanceListView(
   {
-    instances,
+    state,
     onSelectProperty,
     onClickRefresh,
-    hideNonDebuggableProperties,
-    valueChangedEvents,
-    onHideNonDebuggablePropertiesCheckedChange,
+    onChangeNonDebuggablePropertyVisible,
   }: InstanceListProps
 ) {
   const eventsByInstance = (instanceUUID: string) => {
-    const events = valueChangedEvents.filter((event) => event.instanceUUID == instanceUUID);
+    const events = state.valueChangedEvents.filter((event) => event.instanceUUID == instanceUUID);
     if (!events) return [];
     return events;
   }
 
   return <Layout.Container padv={theme.inlinePaddingV} padh={theme.inlinePaddingH} gap={theme.space.medium} grow={true}>
-    <Row>
-      hide non-debuggable properties:
-      <Space size={theme.space.medium}/>
+    <Layout.Horizontal gap={theme.space.medium} style={{display: "flex", alignItems: "center"}}>
+      show non-debuggable properties:
       <Switch
-        checked={hideNonDebuggableProperties}
-        onChange={onHideNonDebuggablePropertiesCheckedChange}
+        checked={state.nonDebuggablePropertyVisible}
+        onChange={(visible) => {
+          onChangeNonDebuggablePropertyVisible(visible)
+        }}
       />
-    </Row>
-    <Button onClick={onClickRefresh}>Refresh<ReloadOutlined/></Button>
+      <Button onClick={onClickRefresh}>Refresh<ReloadOutlined/></Button>
+    </Layout.Horizontal>
     <Layout.ScrollContainer>
       <Collapse>
-        {instances.map((instance) => (
+        {state.instances.map((instance) => (
           <Collapse.Panel header={<InstanceHeader instance={instance}/>} key={instance.instanceUUID}>
             <InstanceProperties
               instance={instance}
               onClickProperty={(propertyName) => {
                 onSelectProperty(instance.instanceUUID, propertyName);
               }}
-              hideNonDebuggableProperties={hideNonDebuggableProperties}
+              nonDebuggablePropertyVisible={state.nonDebuggablePropertyVisible}
               getNumOfEvents={(propertyName) => {
                 return eventsByInstance(instance.instanceUUID).filter((event) => event.propertyName == propertyName).length;
               }}
@@ -73,11 +69,11 @@ function InstanceHeader({instance}: {
   )
 }
 
-function InstanceProperties({instance, onClickProperty, getNumOfEvents, hideNonDebuggableProperties}: {
+function InstanceProperties({instance, onClickProperty, getNumOfEvents, nonDebuggablePropertyVisible}: {
   instance: DebuggableStateHolderInfo,
   onClickProperty: (propertyName: string) => void,
   getNumOfEvents: (propertyName: string) => number,
-  hideNonDebuggableProperties: boolean,
+  nonDebuggablePropertyVisible: boolean,
 }) {
   return (
     <List
@@ -88,7 +84,7 @@ function InstanceProperties({instance, onClickProperty, getNumOfEvents, hideNonD
           onClick={() => {
             onClickProperty(property.name)
           }}
-          hidden={hideNonDebuggableProperties && !property.debuggable}
+          hidden={!nonDebuggablePropertyVisible && !property.debuggable}
         >
           <>
             <List.Item.Meta

@@ -1,5 +1,5 @@
 import React from "react";
-import {RegisteredInstancePage} from "../page/registered_instance/RegisteredInstancePage";
+import {InstanceListPage} from "../page/instance_list/InstanceListPage";
 import RawLogPage from "../page/raw_logs/RawLogPage";
 import {Tabs} from "flipper-plugin";
 import {TabsProps} from "antd";
@@ -14,7 +14,7 @@ export function TabbedContent({activeKey, onChange}: TabMenuProps) {
     {
       key: '1',
       label: 'Registered instances',
-      children: <RegisteredInstancePage/>
+      children: <InstanceListPage/>
     },
     {
       key: '2',

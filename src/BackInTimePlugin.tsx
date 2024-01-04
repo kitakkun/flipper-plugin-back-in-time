@@ -6,12 +6,14 @@ import {OutgoingEvents} from "./events/FlipperOutgoingEvents";
 import {configureStore} from "@reduxjs/toolkit";
 import {flipperActions, flipperReducer} from "./reducer/flipperReducer";
 import {appReducer} from "./reducer/appReducer";
+import {instanceListReducer} from "./view/page/instance_list/InstanceListReducer";
 
 export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
   const store = configureStore({
     reducer: {
       app: appReducer,
       flipper: flipperReducer,
+      instanceList: instanceListReducer,
     },
   });
 
