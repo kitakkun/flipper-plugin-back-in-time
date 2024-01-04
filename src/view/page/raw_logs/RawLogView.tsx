@@ -1,6 +1,6 @@
 import React from "react";
 import {RawEventLog} from "../../../data/RawEventLog";
-import {createDataSource, DataSource, DataTable, DataTableColumn, Layout, styled, theme} from "flipper-plugin";
+import {createDataSource, DataTable, DataTableColumn, Layout, theme} from "flipper-plugin";
 
 type RawLogPageProps = {
   rawEventLog: RawEventLog[];

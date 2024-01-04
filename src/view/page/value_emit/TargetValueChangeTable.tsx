@@ -1,7 +1,7 @@
 import React from "react";
 import {NotifyValueChange} from "../../../events/FlipperIncomingEvents";
 import {DebuggableStateHolderInfo, PropertyInfo} from "../../../data/RegisterInstance";
-import {Button, Table, Typography} from "antd";
+import {Table, Typography} from "antd";
 import {EmitButton} from "./EmitButton";
 
 type TargetValueChangeTableProps = {
