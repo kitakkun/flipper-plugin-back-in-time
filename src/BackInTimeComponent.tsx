@@ -2,7 +2,7 @@
 // API: https://fbflipper.com/docs/extending/flipper-plugin#react-hooks
 import {Layout} from "flipper-plugin";
 import React from "react";
-import BackInTimeSideBar from "./view/sidebar/BackInTimeSideBar";
+import {BackInTimeSideBar} from "./view/sidebar/BackInTimeSideBar";
 import {TabbedContent} from "./view/component/TabbedContent";
 import {useDispatch, useSelector} from "react-redux";
 import {appActions, selectActiveTabIndex} from "./reducer/appReducer";

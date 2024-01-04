@@ -6,16 +6,12 @@ import {NotifyValueChange} from "../../../events/FlipperIncomingEvents";
 export interface InstanceListState {
   instances: DebuggableStateHolderInfo[];
   valueChangedEvents: NotifyValueChange[];
-  selectedInstanceUUID: string | null;
-  selectedPropertyName: string | null;
   nonDebuggablePropertyVisible: boolean;
 }
 
 const initialState: InstanceListState = {
   instances: [],
   valueChangedEvents: [],
-  selectedInstanceUUID: null,
-  selectedPropertyName: null,
   nonDebuggablePropertyVisible: true,
 };
 
@@ -23,10 +19,6 @@ const instanceListSlice = createSlice({
   name: "instanceList",
   initialState: initialState,
   reducers: {
-    selectProperty: (state, action) => {
-      state.selectedInstanceUUID = action.payload.instanceUUID;
-      state.selectedPropertyName = action.payload.propertyName;
-    },
     updateNonDebuggablePropertyVisibility: (state, action) => {
       state.nonDebuggablePropertyVisible = action.payload;
     }
