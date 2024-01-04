@@ -6,6 +6,7 @@ export interface AppState {
   selectedInstanceUUID: string | null;
   selectedPropertyName: string | null;
   selectedPropertyValueChangeLog: NotifyValueChange[];
+  hideNonDebuggableProperties: boolean;
 }
 
 const appSlice = createSlice({
@@ -15,6 +16,7 @@ const appSlice = createSlice({
     selectedInstanceUUID: null,
     selectedPropertyName: null,
     selectedPropertyValueChangeLog: [],
+    hideNonDebuggableProperties: true,
   } as AppState,
   reducers: {
     updateActiveTabIndex: (state, action) => {
@@ -24,6 +26,9 @@ const appSlice = createSlice({
       state.selectedInstanceUUID = action.payload.instanceUUID;
       state.selectedPropertyName = action.payload.propertyName;
     },
+    hideNonDebuggablePropertiesToggled: (state, action) => {
+      state.hideNonDebuggableProperties = action.payload;
+    }
   }
 });
 
@@ -33,3 +38,4 @@ export const appReducer = appSlice.reducer;
 export const selectActiveTabIndex = (state: any) => state.app.activeTabIndex as string;
 export const selectSelectedInstanceUUID = (state: any) => state.app.selectedInstanceUUID as string | null;
 export const selectSelectedPropertyName = (state: any) => state.app.selectedPropertyName as string | null;
+export const selectHideNonDebuggableProperties = (state: any) => state.app.hideNonDebuggableProperties as boolean;

@@ -2,7 +2,7 @@ import React from "react";
 
 import {NotifyValueChange} from "../../../events/FlipperIncomingEvents";
 import {DebuggableStateHolderInfo} from "../../../data/RegisterInstance";
-import {Badge, Button, Collapse, List, Typography} from "antd";
+import {Badge, Button, Collapse, List, Row, Space, Switch, Typography} from "antd";
 import {ReloadOutlined} from "@ant-design/icons";
 import {Layout, theme} from "flipper-plugin";
 
@@ -10,10 +10,21 @@ type InstanceListProps = {
   instances: DebuggableStateHolderInfo[];
   onSelectProperty: (instanceUUID: string, propertyName: string) => void;
   onClickRefresh: () => void;
+  hideNonDebuggableProperties: boolean;
+  onHideNonDebuggablePropertiesCheckedChange: (checked: boolean) => void;
   valueChangedEvents: NotifyValueChange[];
 }
 
-export default function RegisteredInstanceView({instances, onSelectProperty, onClickRefresh, valueChangedEvents}: InstanceListProps) {
+export default function RegisteredInstanceView(
+  {
+    instances,
+    onSelectProperty,
+    onClickRefresh,
+    hideNonDebuggableProperties,
+    valueChangedEvents,
+    onHideNonDebuggablePropertiesCheckedChange,
+  }: InstanceListProps
+) {
   const eventsByInstance = (instanceUUID: string) => {
     const events = valueChangedEvents.filter((event) => event.instanceUUID == instanceUUID);
     if (!events) return [];
@@ -21,6 +32,14 @@ export default function RegisteredInstanceView({instances, onSelectProperty, onC
   }
 
   return <Layout.Container padv={theme.inlinePaddingV} padh={theme.inlinePaddingH} gap={theme.space.medium}>
+    <Row>
+      hide non-debuggable properties:
+      <Space size={theme.space.medium}/>
+      <Switch
+        checked={hideNonDebuggableProperties}
+        onChange={onHideNonDebuggablePropertiesCheckedChange}
+      />
+    </Row>
     <Button onClick={onClickRefresh}>Refresh<ReloadOutlined/></Button>
     <Collapse>
       {instances.map((instance) => (
@@ -30,6 +49,7 @@ export default function RegisteredInstanceView({instances, onSelectProperty, onC
             onClickProperty={(propertyName) => {
               onSelectProperty(instance.instanceUUID, propertyName);
             }}
+            hideNonDebuggableProperties={hideNonDebuggableProperties}
             getNumOfEvents={(propertyName) => {
               return eventsByInstance(instance.instanceUUID).filter((event) => event.propertyName == propertyName).length;
             }}
@@ -51,10 +71,11 @@ function InstanceHeader({instance}: {
   )
 }
 
-function InstanceProperties({instance, onClickProperty, getNumOfEvents}: {
+function InstanceProperties({instance, onClickProperty, getNumOfEvents, hideNonDebuggableProperties}: {
   instance: DebuggableStateHolderInfo,
   onClickProperty: (propertyName: string) => void,
   getNumOfEvents: (propertyName: string) => number,
+  hideNonDebuggableProperties: boolean,
 }) {
   return (
     <List
@@ -65,6 +86,7 @@ function InstanceProperties({instance, onClickProperty, getNumOfEvents}: {
           onClick={() => {
             onClickProperty(property.name)
           }}
+          hidden={hideNonDebuggableProperties && !property.debuggable}
         >
           <>
             <List.Item.Meta
