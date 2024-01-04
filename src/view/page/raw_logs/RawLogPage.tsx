@@ -1,10 +1,10 @@
 import React from "react";
 import {useSelector} from "react-redux";
-import {selectRawEvents} from "../../../reducer/flipperReducer";
 import {RawLogView} from "./RawLogView";
+import {rawEventLogStateSelector} from "./RawEventLogReducer";
 
 export default function RawLogPage() {
-  const rawEventLog = useSelector(selectRawEvents);
+  const state = useSelector(rawEventLogStateSelector);
 
-  return <RawLogView rawEventLog={rawEventLog}/>;
+  return <RawLogView rawEventLog={state.logs}/>;
 }

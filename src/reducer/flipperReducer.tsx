@@ -9,7 +9,6 @@ export type FlipperEvent = {
   registerInstance: DebuggableStateHolderInfo[];
   valueChanges: NotifyValueChange[];
   methodCalls: NotifyMethodCall[];
-  rawEvents: RawEventLog[];
   pendingForceSetPropertyValueEvent: FlipperPendingEvent<ForceSetPropertyValue> | null;
   pendingRefreshInstanceAliveStatusEvent: FlipperPendingEvent<CheckInstanceAlive> | null;
 }
@@ -18,7 +17,6 @@ const initialState: FlipperEvent = {
   registerInstance: [],
   valueChanges: [],
   methodCalls: [],
-  rawEvents: [],
   pendingForceSetPropertyValueEvent: null,
   pendingRefreshInstanceAliveStatusEvent: null,
 }
@@ -28,19 +26,15 @@ const flipperEventSlice = createSlice({
   initialState: initialState,
   reducers: {
     registerInstance: (state, action: PayloadAction<RegisterInstance>) => {
-      state.rawEvents.push({label: "register", payload: action.payload});
       state.registerInstance.push({...action.payload, alive: true});
     },
     notifyValueChange: (state, action: PayloadAction<NotifyValueChange>) => {
-      state.rawEvents.push({label: "valueChange", payload: action.payload});
       state.valueChanges.push(action.payload);
     },
     notifyMethodCall: (state, action: PayloadAction<NotifyMethodCall>) => {
-      state.rawEvents.push({label: "methodCall", payload: action.payload});
       state.methodCalls.push(action.payload);
     },
     updateInstanceAliveStatus: (state, action: PayloadAction<CheckInstanceAliveResponse>) => {
-      state.rawEvents.push({label: "checkInstanceAlive", payload: action.payload});
       const response = action.payload
       Object.entries(response.isAlive).forEach(([instanceUUID, alive]) => {
         const instance = state.registerInstance.find((info) => info.instanceUUID == instanceUUID);

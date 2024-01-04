@@ -8,6 +8,7 @@ import {flipperActions, flipperReducer} from "./reducer/flipperReducer";
 import {appReducer} from "./reducer/appReducer";
 import {instanceListReducer} from "./view/page/instance_list/InstanceListReducer";
 import {sidebarReducer} from "./view/sidebar/sidebarReducer";
+import {rawEventLogReducer} from "./view/page/raw_logs/RawEventLogReducer";
 
 export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
   const store = configureStore({
@@ -15,6 +16,7 @@ export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
       app: appReducer,
       flipper: flipperReducer,
       instanceList: instanceListReducer,
+      rawEventLog: rawEventLogReducer,
       sidebar: sidebarReducer,
     },
   });
