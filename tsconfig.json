@@ -8,7 +8,10 @@
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "react": ["./node_modules/@types/react"],
+    },
   },
   "files": ["src/index.tsx"]
 }
