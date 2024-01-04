@@ -1,8 +1,8 @@
 import React from "react";
-import {Tabs, TabsProps} from "antd";
 import {RegisteredInstancePage} from "../page/registered_instance/RegisteredInstancePage";
 import RawLogPage from "../page/raw_logs/RawLogPage";
-import {History} from "@mui/icons-material";
+import {Tabs} from "flipper-plugin";
+import {TabsProps} from "antd";
 
 type TabMenuProps = {
   activeKey: string;
@@ -29,6 +29,7 @@ export function TabbedContent({activeKey, onChange}: TabMenuProps) {
       items={items}
       onChange={onChange}
       type={'card'}
+      grow={true}
     />
   );
 }

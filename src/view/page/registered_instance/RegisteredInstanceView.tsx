@@ -31,7 +31,7 @@ export default function RegisteredInstanceView(
     return events;
   }
 
-  return <Layout.Container padv={theme.inlinePaddingV} padh={theme.inlinePaddingH} gap={theme.space.medium}>
+  return <Layout.Container padv={theme.inlinePaddingV} padh={theme.inlinePaddingH} gap={theme.space.medium} grow={true}>
     <Row>
       hide non-debuggable properties:
       <Space size={theme.space.medium}/>
@@ -41,22 +41,24 @@ export default function RegisteredInstanceView(
       />
     </Row>
     <Button onClick={onClickRefresh}>Refresh<ReloadOutlined/></Button>
-    <Collapse>
-      {instances.map((instance) => (
-        <Collapse.Panel header={<InstanceHeader instance={instance}/>} key={instance.instanceUUID}>
-          <InstanceProperties
-            instance={instance}
-            onClickProperty={(propertyName) => {
-              onSelectProperty(instance.instanceUUID, propertyName);
-            }}
-            hideNonDebuggableProperties={hideNonDebuggableProperties}
-            getNumOfEvents={(propertyName) => {
-              return eventsByInstance(instance.instanceUUID).filter((event) => event.propertyName == propertyName).length;
-            }}
-          />
-        </Collapse.Panel>
-      ))}
-    </Collapse>
+    <Layout.ScrollContainer>
+      <Collapse>
+        {instances.map((instance) => (
+          <Collapse.Panel header={<InstanceHeader instance={instance}/>} key={instance.instanceUUID}>
+            <InstanceProperties
+              instance={instance}
+              onClickProperty={(propertyName) => {
+                onSelectProperty(instance.instanceUUID, propertyName);
+              }}
+              hideNonDebuggableProperties={hideNonDebuggableProperties}
+              getNumOfEvents={(propertyName) => {
+                return eventsByInstance(instance.instanceUUID).filter((event) => event.propertyName == propertyName).length;
+              }}
+            />
+          </Collapse.Panel>
+        ))}
+      </Collapse>
+    </Layout.ScrollContainer>
   </Layout.Container>;
 }
 
