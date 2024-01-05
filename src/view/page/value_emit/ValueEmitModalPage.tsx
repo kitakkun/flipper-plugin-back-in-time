@@ -1,11 +1,11 @@
 import {useDispatch, useSelector} from "react-redux";
-import {flipperActions} from "../../../reducer/flipperReducer";
 import React from "react";
 import {ValueEmitView} from "./ValueEmitView";
 import {valueEmitActions, valueEmitStateSelector} from "./ValueEmitReducer";
 import {Modal} from "antd";
-import {EditAndEmitValueModalPage} from "../edited_value_emitter/EditAndEmitValueModalPage";
 import {editAndEmitValueActions} from "../edited_value_emitter/EditAndEmitValueReducer";
+import {appActions} from "../../../reducer/appReducer";
+import {EditAndEmitValueModalPage} from "../edited_value_emitter/EditAndEmitValueModalPage";
 
 export function ValueEmitModalPage() {
   const state = useSelector(valueEmitStateSelector);
@@ -25,16 +25,16 @@ export function ValueEmitModalPage() {
         <ValueEmitView
           state={state}
           onValueEmit={(propertyName: string, value: string) => {
-            const instanceUUID = state.instanceInfo?.instanceUUID;
-            const valueType = state.instanceInfo?.properties.find((property) => property.name == propertyName)?.valueType;
+            const instanceUUID = state.instanceInfo?.uuid;
+            const valueType = state.classInfo?.properties.find((property) => property.name == propertyName)?.valueType;
             if (!instanceUUID || !valueType) {
               return;
             }
-            dispatch(flipperActions.sendForceSetPropertyValue({instanceUUID, propertyName, value, valueType}))
+            dispatch(appActions.forceSetPropertyValue({instanceUUID, propertyName, value, valueType}))
           }}
           onEditAndEmitValue={(propertyName: string, value: string) => {
-            const instanceUUID = state.instanceInfo?.instanceUUID;
-            const valueType = state.instanceInfo?.properties.find((property) => property.name == propertyName)?.valueType;
+            const instanceUUID = state.instanceInfo?.uuid;
+            const valueType = state.classInfo?.properties.find((property) => property.name == propertyName)?.valueType;
             if (!instanceUUID || !valueType) {
               return;
             }
@@ -43,7 +43,6 @@ export function ValueEmitModalPage() {
               editAndEmitValueActions.open({
                 instanceUUID: instanceUUID,
                 propertyName: propertyName,
-                valueType: valueType,
                 initialValue: parsedValue,
               })
             );

@@ -1,8 +1,8 @@
-import MethodCallInfo from "./MethodCallInfo";
-import {TargetValueChangeTable} from "./TargetValueChangeTable";
+import {ChangedPropertiesView} from "./ChangedPropertiesView";
 import React from "react";
 import {Layout, theme} from "flipper-plugin";
 import {ValueEmitState} from "./ValueEmitReducer";
+import {MethodCallInfoView} from "./MethodCallInfoView";
 
 type ValueEmitViewProps = {
   state: ValueEmitState,
@@ -11,20 +11,20 @@ type ValueEmitViewProps = {
 };
 
 export function ValueEmitView({state, onValueEmit, onEditAndEmitValue}: ValueEmitViewProps) {
-  if (!state.instanceInfo || !state.methodCallInfo) {
+  if (!state.instanceInfo || !state.methodCallInfo || !state.classInfo) {
     return null;
   }
 
   return (
     <Layout.Container padh={theme.inlinePaddingH} padv={theme.inlinePaddingV} gap={theme.space.medium} grow={true}>
-      <MethodCallInfo
+      <MethodCallInfoView
         methodCallUUID={state.methodCallInfo?.callUUID}
-        instanceUUID={state.instanceInfo.instanceUUID}
+        instanceUUID={state.instanceInfo.uuid}
         calledAt={state.methodCallInfo.calledAt}
         methodName={state.methodCallInfo.methodName}
       />
-      <TargetValueChangeTable
-        instance={state.instanceInfo}
+      <ChangedPropertiesView
+        classInfo={state.classInfo}
         methodCallInfo={state.methodCallInfo}
         onClickEmitValue={onValueEmit}
         onClickEditAndEmitValue={onEditAndEmitValue}

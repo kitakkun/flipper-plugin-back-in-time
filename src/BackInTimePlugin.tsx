@@ -2,12 +2,17 @@
 // API: https://fbflipper.com/docs/extending/flipper-plugin#pluginclient
 import {createState, PluginClient} from "flipper-plugin";
 import {IncomingEvents} from "./events/FlipperIncomingEvents";
-import {OutgoingEvents} from "./events/FlipperOutgoingEvents";
+import {
+  isCheckInstanceAlive,
+  isForceSetPropertyValue,
+  OutgoingEvent,
+  OutgoingEvents
+} from "./events/FlipperOutgoingEvents";
 import {configureStore, Dispatch, Store} from "@reduxjs/toolkit";
-import {flipperActions, flipperReducer} from "./reducer/flipperReducer";
-import {appReducer} from "./reducer/appReducer";
+import {flipperReducer} from "./reducer/flipperReducer";
+import {appActions, appReducer} from "./reducer/appReducer";
 import {instanceListReducer} from "./view/page/instance_list/InstanceListReducer";
-import {sidebarReducer} from "./view/sidebar/sidebarReducer";
+import {sidebarReducer} from "./reducer/sidebarReducer";
 import {rawEventLogReducer} from "./view/page/raw_logs/RawEventLogReducer";
 import {valueEmitReducer} from "./view/page/value_emit/ValueEmitReducer";
 import {editAndEmitValueReducer} from "./view/page/edited_value_emitter/EditAndEmitValueReducer";
@@ -22,6 +27,7 @@ export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
 
   const store = configurePluginStore();
   const dispatch = store.dispatch;
+
   observeIncomingEvents(dispatch, client);
   observeOutgoingEvents(dispatch, store, client);
 
@@ -44,28 +50,27 @@ function configurePluginStore(): Store {
 }
 
 function observeIncomingEvents(dispatch: Dispatch, client: PluginClient<IncomingEvents, OutgoingEvents>) {
-  client.onMessage("register", (event) => dispatch(flipperActions.registerInstance(event)));
-  client.onMessage("notifyValueChange", (event) => dispatch(flipperActions.notifyValueChange(event)));
-  client.onMessage("notifyMethodCall", (event) => dispatch(flipperActions.notifyMethodCall(event)));
+  client.onMessage("register", (event) => dispatch(appActions.register(event)));
+  client.onMessage("notifyValueChange", (event) => dispatch(appActions.registerValueChange(event)));
+  client.onMessage("notifyMethodCall", (event) => dispatch(appActions.registerMethodCall(event)));
 }
 
 function observeOutgoingEvents(dispatch: Dispatch, store: Store, client: PluginClient<IncomingEvents, OutgoingEvents>) {
   store.subscribe(() => {
-    const pendingEvent = store.getState().flipper.pendingForceSetPropertyValueEvent
-    if (pendingEvent && !pendingEvent.sent) {
-      dispatch(flipperActions.sendForceSetPropertyValueEventCompleted());
-      client.send("forceSetPropertyValue", pendingEvent.payload);
-    }
+    const pendingEvents = store.getState().app.pendingFlipperEventQueue as OutgoingEvent[];
+    if (pendingEvents.length == 0) return;
+    dispatch(appActions.clearPendingEventQueue());
+    pendingEvents.forEach((event) => processOutgoingEvent(client, event, dispatch));
   });
+}
 
-  store.subscribe(() => {
-    const pendingEvent = store.getState().flipper.pendingRefreshInstanceAliveStatusEvent
-    if (pendingEvent && !pendingEvent.sent) {
-      dispatch(flipperActions.sendRefreshInstanceAliveStatusEventCompleted());
-      client.send("refreshInstanceAliveStatus", pendingEvent.payload)
-        .then((response) => dispatch(flipperActions.updateInstanceAliveStatus(response)));
-    }
-  });
+function processOutgoingEvent(client: PluginClient<IncomingEvents, OutgoingEvents>, event: OutgoingEvent, dispatch: Dispatch) {
+  if (isForceSetPropertyValue(event)) {
+    client.send("forceSetPropertyValue", event);
+  } else if (isCheckInstanceAlive(event)) {
+    client.send("refreshInstanceAliveStatus", event)
+      .then((response) => dispatch(appActions.updateInstanceAliveStatuses(response)));
+  }
 }
 
 function generatePersistentStates(): AtomicPersistentState {

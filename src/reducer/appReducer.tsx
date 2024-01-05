@@ -1,22 +1,115 @@
-import {createSlice} from "@reduxjs/toolkit";
+import {createSelector, createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {ClassInfo} from "../data/ClassInfo";
+import {InstanceInfo} from "../data/InstanceInfo";
+import {MethodCallInfo} from "../data/MethodCallInfo";
+import {NotifyMethodCall, NotifyValueChange, RegisterInstance} from "../events/FlipperIncomingEvents";
+import {
+  CheckInstanceAlive,
+  CheckInstanceAliveResponse,
+  ForceSetPropertyValue,
+  OutgoingEvent
+} from "../events/FlipperOutgoingEvents";
 
 export interface AppState {
   activeTabIndex: string;
+
+  // low level data obtains from flipper connection
+  classInfoList: ClassInfo[];
+  instanceInfoList: InstanceInfo[];
+  methodCallInfoList: MethodCallInfo[];
+
+  // to emit flipper events from everywhere
+  pendingFlipperEventQueue: OutgoingEvent[];
 }
+
+const initialState: AppState = {
+  activeTabIndex: '1',
+  classInfoList: [],
+  instanceInfoList: [],
+  methodCallInfoList: [],
+  pendingFlipperEventQueue: [],
+};
 
 const appSlice = createSlice({
   name: "app",
-  initialState: {
-    activeTabIndex: '1',
-  } as AppState,
+  initialState: initialState,
   reducers: {
+    register: (state, action: PayloadAction<RegisterInstance>) => {
+      const event = action.payload;
+      state.instanceInfoList.push({
+        uuid: event.instanceUUID,
+        className: event.instanceType,
+        alive: true,
+        registeredAt: event.registeredAt,
+      });
+      state.classInfoList.push({
+        name: event.instanceType,
+        properties: event.properties.map((property) => (
+          {
+            name: property.name,
+            type: property.propertyType,
+            valueType: property.valueType,
+            debuggable: property.debuggable,
+          }
+        )),
+      })
+    },
+    registerMethodCall: (state, action: PayloadAction<NotifyMethodCall>) => {
+      const event = action.payload;
+      state.methodCallInfoList.push({
+        callUUID: event.methodCallUUID,
+        instanceUUID: event.instanceUUID,
+        methodName: event.methodName,
+        calledAt: event.calledAt,
+        valueChanges: [],
+      });
+    },
+    registerValueChange: (state, action: PayloadAction<NotifyValueChange>) => {
+      const event = action.payload;
+      const methodCallInfo = state.methodCallInfoList.find((info) => info.callUUID == event.methodCallUUID);
+      if (!methodCallInfo) return;
+      methodCallInfo.valueChanges.push({
+        propertyName: event.propertyName,
+        value: event.value,
+      });
+    },
+    forceSetPropertyValue: (state, action: PayloadAction<ForceSetPropertyValue>) => {
+      state.pendingFlipperEventQueue.push(action.payload);
+    },
+    refreshInstanceAliveStatuses: (state, action: PayloadAction<CheckInstanceAlive>) => {
+      state.pendingFlipperEventQueue.push(action.payload);
+    },
+    clearPendingEventQueue: (state) => {
+      state.pendingFlipperEventQueue = [];
+    },
+    updateInstanceAliveStatuses: (state, action: PayloadAction<CheckInstanceAliveResponse>) => {
+      Object.entries(action.payload.isAlive).forEach(([instanceUUID, alive]) => {
+        const instanceInfo = state.instanceInfoList.find((info) => info.uuid == instanceUUID);
+        if (!instanceInfo) return;
+        instanceInfo.alive = alive;
+      });
+    },
     updateActiveTabIndex: (state, action) => {
       state.activeTabIndex = action.payload;
     },
-  }
+  },
 });
 
 export const appActions = appSlice.actions;
 export const appReducer = appSlice.reducer;
+
+export const appStateSelector = (state: any) => state.app as AppState;
+export const instanceInfoListSelector = createSelector(
+  [appStateSelector],
+  (state) => state.instanceInfoList
+);
+export const classInfoListSelector = createSelector(
+  [appStateSelector],
+  (state) => state.classInfoList
+);
+export const methodCallInfoListSelector = createSelector(
+  [appStateSelector],
+  (state) => state.methodCallInfoList
+);
 
 export const selectActiveTabIndex = (state: any) => state.app.activeTabIndex as string;

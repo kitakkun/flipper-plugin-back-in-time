@@ -1,34 +1,40 @@
 import React from "react";
-import {DebuggableStateHolderInfo, PropertyInfo} from "../../../data/RegisterInstance";
-import {InstanceInfoTable} from "../InstanceInfoTable";
-import {PropertyInfoTable} from "../PropertyInfoTable";
-import {PropertyValueChangeTable} from "../PropertyValueChangeTable";
+import {InstanceInfoView} from "../InstanceInfoView";
+import {PropertyInfoView} from "../PropertyInfoView";
+import {PropertyValueChangesView} from "../PropertyValueChangesView";
 import {Layout, theme} from "flipper-plugin";
 import {MethodCallInfo} from "../../../data/MethodCallInfo";
+import {InstanceInfo} from "../../../data/InstanceInfo";
+import {PropertyInfo} from "../../../data/ClassInfo";
+
+export interface PropertyInspectorState {
+  instanceInfo: InstanceInfo | undefined;
+  propertyInfo: PropertyInfo | undefined;
+  methodCallInfoList: MethodCallInfo[];
+}
 
 type PropertyInspectorProps = {
-  selectedInstance: DebuggableStateHolderInfo;
-  selectedPropertyInfo: PropertyInfo;
-  methodCallInfoList: MethodCallInfo[];
+  state: PropertyInspectorState;
   onClickValueChangeInfo: (methodCallInfo: MethodCallInfo) => void;
 }
 
 export default function PropertyInspectorView(
   {
-    selectedInstance,
-    selectedPropertyInfo,
-    methodCallInfoList,
+    state,
     onClickValueChangeInfo,
   }: PropertyInspectorProps
 ) {
+  if (!state.instanceInfo || !state.propertyInfo) {
+    return null;
+  }
   return (
     <>
       <Layout.Container gap={theme.space.medium} pad={theme.inlinePaddingH}>
-        <InstanceInfoTable instanceInfo={selectedInstance}/>
-        <PropertyInfoTable propertyInfo={selectedPropertyInfo}/>
-        <PropertyValueChangeTable
-          methodCallInfoList={methodCallInfoList}
-          selectedPropertyInfo={selectedPropertyInfo}
+        <InstanceInfoView instanceInfo={state.instanceInfo}/>
+        <PropertyInfoView propertyInfo={state.propertyInfo}/>
+        <PropertyValueChangesView
+          methodCallInfoList={state.methodCallInfoList}
+          selectedPropertyInfo={state.propertyInfo}
           onClickRow={(methodCallInfo) => {
             onClickValueChangeInfo(methodCallInfo)
           }}/>

@@ -1,12 +1,12 @@
 import {Table, Typography} from "antd";
 import React from "react";
-import {PropertyInfo} from "../../data/RegisterInstance";
+import {PropertyInfo} from "../../data/ClassInfo";
 
 type PropertyInfoTableProps = {
   propertyInfo: PropertyInfo;
 }
 
-export function PropertyInfoTable({propertyInfo}: PropertyInfoTableProps) {
+export function PropertyInfoView({propertyInfo}: PropertyInfoTableProps) {
   const dataSource = [
     {
       key: '1',
@@ -16,7 +16,7 @@ export function PropertyInfoTable({propertyInfo}: PropertyInfoTableProps) {
     {
       key: '2',
       name: 'propertyType',
-      value: propertyInfo.propertyType,
+      value: propertyInfo.type,
     },
     {
       key: '3',

@@ -8,7 +8,7 @@ type MethodCallInfoProps = {
   calledAt: number;
 }
 
-export default function ({instanceUUID, methodName, methodCallUUID, calledAt}: MethodCallInfoProps) {
+export function MethodCallInfoView({instanceUUID, methodName, methodCallUUID, calledAt}: MethodCallInfoProps) {
   const dataSource = [
     {
       name: "instanceUUID",

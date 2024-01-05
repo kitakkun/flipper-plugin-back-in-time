@@ -1,22 +1,22 @@
 import {Table, Typography} from "antd";
-import {DebuggableStateHolderInfo} from "../../data/RegisterInstance";
 import React from "react";
+import {InstanceInfo} from "../../data/InstanceInfo";
 
 type InstanceInfoProps = {
-  instanceInfo: DebuggableStateHolderInfo;
+  instanceInfo: InstanceInfo;
 }
 
-export function InstanceInfoTable({instanceInfo}: InstanceInfoProps) {
+export function InstanceInfoView({instanceInfo}: InstanceInfoProps) {
   const dataSource = [
     {
       key: '1',
       name: 'id',
-      value: instanceInfo.instanceUUID,
+      value: instanceInfo.uuid,
     },
     {
       key: '2',
       name: 'type',
-      value: instanceInfo.instanceType,
+      value: instanceInfo.className,
     },
     {
       key: '3',

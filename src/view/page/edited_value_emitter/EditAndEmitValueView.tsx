@@ -1,24 +1,21 @@
-import {EditAndEmitValueState} from "./EditAndEmitValueReducer";
 import ReactJson from "@microlink/react-json-view";
 import {Layout, theme} from "flipper-plugin";
 import React from "react";
 import {Input, Typography} from "antd";
+import {EditAndEmitState} from "./EditAndEmitValueReducer";
 
 interface EditAndEmitValueViewProps {
-  state: EditAndEmitValueState;
+  state: EditAndEmitState;
   onEdit: (edit: any) => void;
 }
 
 export function EditAndEmitValueView({state, onEdit}: EditAndEmitValueViewProps) {
-  const valueType = typeof state.initialValue;
-  // undefined に対して比較するとUIが死ぬ
-  if (valueType == "undefined") return <>ERROR: undefined value detected.</>;
   return (
     <Layout.Horizontal gap={theme.space.medium}>
       {/* リテラルでJSONビュアーが表示されないFIX（もう1箇所ある）*/}
       <Layout.Container>
         {
-          valueType == "object" ? <ReactJson
+          typeof state.initialValue == "object" ? <ReactJson
             name={null}
             src={state.initialValue}
             theme={"rjv-default"}
@@ -30,9 +27,7 @@ export function EditAndEmitValueView({state, onEdit}: EditAndEmitValueViewProps)
                 return true;
               }
             }}
-          /> : <Input defaultValue={state.initialValue} onChange={(e) => {
-            onEdit(e.target.value)
-          }}/>
+          /> : <Input defaultValue={state.initialValue} onChange={(e) => onEdit(e.target.value)}/>
         }
       </Layout.Container>
       <Layout.Container>

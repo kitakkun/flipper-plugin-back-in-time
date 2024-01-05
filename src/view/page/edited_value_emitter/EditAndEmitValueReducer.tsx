@@ -1,44 +1,47 @@
-import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {createSelector, createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {classInfoListSelector, instanceInfoListSelector} from "../../../reducer/appReducer";
 
-export interface EditAndEmitValueState {
+export interface EditAndEmitState {
   initialValue: any;
   editingValue: any;
   open: boolean;
   instanceUUID: string;
   propertyName: string;
-  valueType: string;
+  valueType: string | undefined;
 }
 
-const initialState: EditAndEmitValueState = {
+export interface EditAndEmitReducerState {
+  initialValue: any;
+  editingValue: any;
+  open: boolean;
+  instanceUUID: string;
+  propertyName: string;
+}
+
+const initialState: EditAndEmitReducerState = {
   initialValue: undefined,
   editingValue: undefined,
   open: false,
   instanceUUID: "",
   propertyName: "",
-  valueType: "",
 };
 
-interface EditAndEmitValueParams {
+interface EditAndEmitValueNavArgument {
   initialValue: any;
   instanceUUID: string;
   propertyName: string;
-  valueType: string;
 }
 
 const editAndEmitValueSlice = createSlice({
   name: "editAndEmitValue",
   initialState: initialState,
   reducers: {
-    open: (state, action: PayloadAction<EditAndEmitValueParams>) => {
+    open: (state, action: PayloadAction<EditAndEmitValueNavArgument>) => {
       state.initialValue = action.payload.initialValue;
       state.editingValue = action.payload.initialValue;
       state.instanceUUID = action.payload.instanceUUID;
       state.propertyName = action.payload.propertyName;
-      state.valueType = action.payload.valueType;
       state.open = true;
-    },
-    confirmValueEdit: (state) => {
-      state.open = false;
     },
     close: (state) => {
       state.open = false;
@@ -52,4 +55,17 @@ const editAndEmitValueSlice = createSlice({
 export const editAndEmitValueActions = editAndEmitValueSlice.actions;
 export const editAndEmitValueReducer = editAndEmitValueSlice.reducer;
 
-export const editAndEmitValueStateSelector = (state: any) => state.editAndEmitValue as EditAndEmitValueState;
+const editAndEmitValueReducerStateSelector = (state: any) => state.editAndEmitValue as EditAndEmitReducerState;
+export const editAndEmitValueStateSelector = createSelector(
+  [editAndEmitValueReducerStateSelector, classInfoListSelector, instanceInfoListSelector],
+  (state, classInfoList, instanceInfoList) => {
+    const instanceInfo = instanceInfoList.find((info) => info.uuid == state.instanceUUID);
+    const classInfo = classInfoList.find((info) => info.name == instanceInfo?.className);
+    const valueType = classInfo?.properties.find((property) => property.name == state.propertyName)?.valueType;
+
+    return {
+      ...state,
+      valueType: valueType,
+    } as EditAndEmitState;
+  }
+);

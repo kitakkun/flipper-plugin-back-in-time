@@ -1,24 +1,27 @@
 import React from "react";
-import {DebuggableStateHolderInfo} from "../../../data/RegisterInstance";
 import {Table, Typography} from "antd";
 import {EmitButton} from "./EmitButton";
 import {MethodCallInfo} from "../../../data/MethodCallInfo";
+import {ClassInfo} from "../../../data/ClassInfo";
+import {ColumnsType} from "antd/lib/table";
 import ReactJson from "@microlink/react-json-view";
 
 type TargetValueChangeTableProps = {
-  instance: DebuggableStateHolderInfo;
+  classInfo: ClassInfo;
   methodCallInfo: MethodCallInfo;
   onClickEmitValue: (propertyName: string, value: string) => void;
   onClickEditAndEmitValue: (propertyName: string, value: string) => void;
 };
 
-export function TargetValueChangeTable({instance, methodCallInfo, onClickEmitValue, onClickEditAndEmitValue}: TargetValueChangeTableProps) {
-  const propertyInfo = (propertyName: string) => {
-    return instance.properties.find((property) => property.name === propertyName);
-  };
+type ValueChangeItem = {
+  action: React.ReactNode;
+  name: string;
+  value: any;
+}
 
-  const dataSource = methodCallInfo.valueChanges.map((valueChange) => {
-    const property = propertyInfo(valueChange.propertyName)!;
+export function ChangedPropertiesView({classInfo, methodCallInfo, onClickEmitValue, onClickEditAndEmitValue}: TargetValueChangeTableProps) {
+  const dataSource: ValueChangeItem[] = methodCallInfo.valueChanges.map((valueChange) => {
+    const property = classInfo.properties.find((property) => property.name === valueChange.propertyName)!;
     const jsonValue = JSON.parse(valueChange.value);
     return {
       action: <EmitButton
@@ -26,11 +29,11 @@ export function TargetValueChangeTable({instance, methodCallInfo, onClickEmitVal
         onClickEditValue={() => onClickEditAndEmitValue(property.name, valueChange.value)}
       />,
       name: property.name,
-      value: jsonValue,
+      value: typeof jsonValue == "object" ? <ReactJson src={jsonValue} name={null}/> : valueChange.value
     };
   });
 
-  const columns = [
+  const columns: ColumnsType<ValueChangeItem> = [
     {
       title: 'action',
       dataIndex: 'action',
@@ -47,15 +50,6 @@ export function TargetValueChangeTable({instance, methodCallInfo, onClickEmitVal
       title: 'value',
       dataIndex: 'value',
       key: 'value',
-      width: "100%",
-      render: (value: any) => (
-        typeof value == "object" ? <ReactJson
-          // リテラルでJSONビュアーが表示されないFIX
-          src={value}
-          name={null}
-          theme={"rjv-default"}
-        /> : <>{value.toString()}</>
-      )
     },
   ];
 

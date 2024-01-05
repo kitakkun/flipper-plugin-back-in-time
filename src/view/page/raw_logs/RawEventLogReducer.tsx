@@ -1,6 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit";
-import {flipperActions} from "../../../reducer/flipperReducer";
 import {RawEventLog} from "../../../data/RawEventLog";
+import {appActions} from "../../../reducer/appReducer";
 
 export interface RawEventLogState {
   logs: RawEventLog[];
@@ -16,18 +16,18 @@ const rawEventLogSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(flipperActions.registerInstance, (state, action) => {
+      .addCase(appActions.register, (state, action) => {
         state.logs.push({label: "register", payload: action.payload});
       })
-      .addCase(flipperActions.updateInstanceAliveStatus, (state, action) => {
+      .addCase(appActions.updateInstanceAliveStatuses, (state, action) => {
           state.logs.push({label: "updateInstanceAliveStatus", payload: action.payload});
         }
       )
-      .addCase(flipperActions.notifyValueChange, (state, action) => {
+      .addCase(appActions.registerValueChange, (state, action) => {
           state.logs.push({label: "notifyValueChange", payload: action.payload});
         }
       )
-      .addCase(flipperActions.notifyMethodCall, (state, action) => {
+      .addCase(appActions.registerMethodCall, (state, action) => {
         state.logs.push({label: "notifyMethodCall", payload: action.payload});
       });
   }

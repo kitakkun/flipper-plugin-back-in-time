@@ -2,8 +2,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {editAndEmitValueActions, editAndEmitValueStateSelector} from "./EditAndEmitValueReducer";
 import {EditAndEmitValueView} from "./EditAndEmitValueView";
 import React from "react";
-import {flipperActions} from "../../../reducer/flipperReducer";
 import {Modal} from "antd";
+import {appActions} from "../../../reducer/appReducer";
 
 export function EditAndEmitValueModalPage() {
   const state = useSelector(editAndEmitValueStateSelector);
@@ -16,8 +16,9 @@ export function EditAndEmitValueModalPage() {
     cancelText={"Cancel"}
     okText={"Emit Edited Value"}
     onOk={() => {
+      if (!state.instanceUUID || !state.propertyName || !state.valueType) return;
       dispatch(
-        flipperActions.sendForceSetPropertyValue({
+        appActions.forceSetPropertyValue({
           instanceUUID: state.instanceUUID,
           propertyName: state.propertyName,
           value: JSON.stringify(state.editingValue),

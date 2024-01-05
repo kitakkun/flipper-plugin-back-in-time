@@ -1,7 +1,7 @@
 import {Table, Typography} from "antd";
 import React from "react";
 import {MethodCallInfo} from "../../data/MethodCallInfo";
-import {PropertyInfo} from "../../data/RegisterInstance";
+import {PropertyInfo} from "../../data/ClassInfo";
 
 type PropertyValueChangeTableProps = {
   selectedPropertyInfo: PropertyInfo;
@@ -9,7 +9,7 @@ type PropertyValueChangeTableProps = {
   onClickRow: (methodCallInfo: MethodCallInfo) => void;
 }
 
-export function PropertyValueChangeTable({selectedPropertyInfo, methodCallInfoList, onClickRow}: PropertyValueChangeTableProps) {
+export function PropertyValueChangesView({selectedPropertyInfo, methodCallInfoList, onClickRow}: PropertyValueChangeTableProps) {
   const columns = [
     {
       title: 'Time',
