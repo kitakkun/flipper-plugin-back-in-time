@@ -41,6 +41,7 @@ export function PropertyValueChangeTable({selectedPropertyInfo, methodCallInfoLi
       dataSource={dataSource}
       columns={columns}
       scroll={{x: true}}
+      size={"small"}
       onRow={(record, _) => {
         return {
           onClick: (event) => {
