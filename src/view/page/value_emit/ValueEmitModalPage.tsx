@@ -15,6 +15,7 @@ export function ValueEmitModalPage() {
     <>
       <EditAndEmitValueModalPage/>
       <Modal
+        centered={true}
         open={state.open}
         title={"Value Emitter"}
         footer={null}

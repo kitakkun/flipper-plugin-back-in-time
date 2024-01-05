@@ -9,6 +9,7 @@ export function EditAndEmitValueModalPage() {
   const state = useSelector(editAndEmitValueStateSelector);
   const dispatch = useDispatch();
   return <Modal
+    centered={true}
     open={state.open}
     title={"Edit and Emit Value"}
     cancelText={"Cancel"}
