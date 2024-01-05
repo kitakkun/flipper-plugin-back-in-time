@@ -19,19 +19,16 @@ export function TargetValueChangeTable({instance, methodCallInfo, onClickEmitVal
 
   const dataSource = methodCallInfo.valueChanges.map((valueChange) => {
     const property = propertyInfo(valueChange.propertyName)!;
+    const jsonValue = JSON.parse(valueChange.value);
     return {
       action: <EmitButton
         onClickEmitValue={() => onClickEmitValue(property.name, valueChange.value)}
         onClickEditValue={() => onClickEditAndEmitValue(property.name, valueChange.value)}
       />,
       name: property.name,
-      value: <ReactJson
-        src={JSON.parse(valueChange.value)}
-        name={null}
-        theme={"rjv-default"}
-      />,
+      value: jsonValue,
     };
-  }).filter((value) => value != null);
+  });
 
   const columns = [
     {
@@ -51,6 +48,14 @@ export function TargetValueChangeTable({instance, methodCallInfo, onClickEmitVal
       dataIndex: 'value',
       key: 'value',
       width: "100%",
+      render: (value: any) => (
+        typeof value == "object" ? <ReactJson
+          // リテラルでJSONビュアーが表示されないFIX
+          src={value}
+          name={null}
+          theme={"rjv-default"}
+        /> : <>{value.toString()}</>
+      )
     },
   ];
 

@@ -1,8 +1,8 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 
 export interface EditAndEmitValueState {
-  initialValue: object;
-  editingValue: object;
+  initialValue: any;
+  editingValue: any;
   open: boolean;
   instanceUUID: string;
   propertyName: string;
@@ -10,8 +10,8 @@ export interface EditAndEmitValueState {
 }
 
 const initialState: EditAndEmitValueState = {
-  initialValue: {},
-  editingValue: {},
+  initialValue: undefined,
+  editingValue: undefined,
   open: false,
   instanceUUID: "",
   propertyName: "",
@@ -19,7 +19,7 @@ const initialState: EditAndEmitValueState = {
 };
 
 interface EditAndEmitValueParams {
-  initialValue: object;
+  initialValue: any;
   instanceUUID: string;
   propertyName: string;
   valueType: string;
