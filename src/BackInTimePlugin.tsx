@@ -11,7 +11,6 @@ import {
 import {configureStore, Dispatch, Store} from "@reduxjs/toolkit";
 import {flipperReducer} from "./reducer/flipperReducer";
 import {appActions, appReducer} from "./reducer/appReducer";
-import {instanceListReducer} from "./view/page/instance_list/InstanceListReducer";
 import {sidebarReducer} from "./reducer/sidebarReducer";
 import {rawEventLogReducer} from "./view/page/raw_logs/RawEventLogReducer";
 import {valueEmitReducer} from "./view/page/value_emit/ValueEmitReducer";
@@ -40,7 +39,6 @@ function configurePluginStore(): Store {
       app: appReducer,
       persistentState: persistentStateReducer(),
       flipper: flipperReducer,
-      instanceList: instanceListReducer,
       rawEventLog: rawEventLogReducer,
       sidebar: sidebarReducer,
       valueEmit: valueEmitReducer,
