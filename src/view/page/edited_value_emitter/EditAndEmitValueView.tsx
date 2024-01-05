@@ -16,7 +16,14 @@ export function EditAndEmitValueView({state, onEdit}: EditAndEmitValueViewProps)
         name={null}
         src={state.initialValue}
         theme={"rjv-default"}
-        onEdit={(edit) => onEdit(edit.updated_src)}
+        onEdit={(edit) => {
+          if (typeof edit.new_value != typeof edit.existing_value) {
+            return false;
+          } else {
+            onEdit(edit.updated_src)
+            return true;
+          }
+        }}
         style={{width: "60%"}}
       />
       <Layout.Container>
@@ -24,6 +31,8 @@ export function EditAndEmitValueView({state, onEdit}: EditAndEmitValueViewProps)
         <Typography.Text>Instance UUID: {state.instanceUUID}</Typography.Text>
         <Typography.Text>Property Name: {state.propertyName}</Typography.Text>
         <Typography.Text>Value Type: {state.valueType}</Typography.Text>
+
+        Note that the value type can not be edited.
       </Layout.Container>
     </Layout.Horizontal>
   );
