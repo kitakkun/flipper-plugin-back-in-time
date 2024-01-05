@@ -10,6 +10,7 @@ import {instanceListReducer} from "./view/page/instance_list/InstanceListReducer
 import {sidebarReducer} from "./view/sidebar/sidebarReducer";
 import {rawEventLogReducer} from "./view/page/raw_logs/RawEventLogReducer";
 import {valueEmitReducer} from "./view/page/value_emit/ValueEmitReducer";
+import {editAndEmitValueReducer} from "./view/page/edited_value_emitter/EditAndEmitValueReducer";
 
 export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
   const store = configureStore({
@@ -20,6 +21,7 @@ export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
       rawEventLog: rawEventLogReducer,
       sidebar: sidebarReducer,
       valueEmit: valueEmitReducer,
+      editAndEmitValue: editAndEmitValueReducer,
     },
   });
 

@@ -8,24 +8,20 @@ type TargetValueChangeTableProps = {
   instance: DebuggableStateHolderInfo;
   methodCallInfo: MethodCallInfo;
   onClickEmitValue: (propertyName: string, value: string) => void;
+  onClickEditAndEmitValue: (propertyName: string, value: string) => void;
 };
 
-export function TargetValueChangeTable({instance, methodCallInfo, onClickEmitValue}: TargetValueChangeTableProps) {
+export function TargetValueChangeTable({instance, methodCallInfo, onClickEmitValue, onClickEditAndEmitValue}: TargetValueChangeTableProps) {
   const propertyInfo = (propertyName: string) => {
     return instance.properties.find((property) => property.name === propertyName);
   };
-
-  const onClick = (propertyName: string, value: string) => {
-    onClickEmitValue(propertyName, value);
-  }
 
   const dataSource = methodCallInfo.valueChanges.map((valueChange) => {
     const property = propertyInfo(valueChange.propertyName)!;
     return {
       action: <EmitButton
-        onClickEmitValue={() => onClick(property.name, valueChange.value)}
-        onClickEditValue={() => {/* TODO */
-        }}
+        onClickEmitValue={() => onClickEmitValue(property.name, valueChange.value)}
+        onClickEditValue={() => onClickEditAndEmitValue(property.name, valueChange.value)}
       />,
       name: property.name,
       type: property.propertyType,
