@@ -2,18 +2,11 @@ import {createSelector, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {MethodCallInfo} from "../../../data/MethodCallInfo";
 import {InstanceInfo} from "../../../data/InstanceInfo";
 import {classInfoListSelector} from "../../../reducer/appReducer";
-import {ClassInfo} from "../../../data/ClassInfo";
+import {ValueEmitState} from "./ValueEmitView";
 
 export interface ValueEmitNavArguments {
   instanceInfo: InstanceInfo;
   methodCallInfo: MethodCallInfo;
-}
-
-export interface ValueEmitState {
-  open: boolean;
-  instanceInfo: InstanceInfo | null;
-  methodCallInfo: MethodCallInfo | null;
-  classInfo: ClassInfo | null;
 }
 
 interface ValueEmitReducerState {

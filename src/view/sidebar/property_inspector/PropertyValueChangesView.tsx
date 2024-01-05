@@ -1,7 +1,7 @@
 import {Table, Typography} from "antd";
 import React from "react";
-import {MethodCallInfo} from "../../data/MethodCallInfo";
-import {PropertyInfo} from "../../data/ClassInfo";
+import {MethodCallInfo} from "../../../data/MethodCallInfo";
+import {PropertyInfo} from "../../../data/ClassInfo";
 
 type PropertyValueChangeTableProps = {
   selectedPropertyInfo: PropertyInfo;

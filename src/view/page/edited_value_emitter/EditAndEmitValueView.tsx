@@ -2,7 +2,15 @@ import ReactJson from "@microlink/react-json-view";
 import {Layout, theme} from "flipper-plugin";
 import React from "react";
 import {Input, Typography} from "antd";
-import {EditAndEmitState} from "./EditAndEmitValueReducer";
+
+export interface EditAndEmitState {
+  initialValue: any;
+  editingValue: any;
+  open: boolean;
+  instanceUUID: string;
+  propertyName: string;
+  valueType: string | undefined;
+}
 
 interface EditAndEmitValueViewProps {
   state: EditAndEmitState;

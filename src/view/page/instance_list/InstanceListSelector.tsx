@@ -1,24 +1,7 @@
 import {classInfoListSelector, instanceInfoListSelector, methodCallInfoListSelector} from "../../../reducer/appReducer";
 import {createSelector} from "@reduxjs/toolkit";
 import {persistentStateSelector} from "../../../reducer/PersistentStateReducer";
-
-export interface InstanceItem {
-  name: string;
-  uuid: string;
-  properties: PropertyItem[];
-}
-
-export interface PropertyItem {
-  name: string;
-  type: string;
-  debuggable: boolean;
-}
-
-export interface InstanceListState {
-  instances: InstanceItem[];
-  showNonDebuggableProperty: boolean;
-  getPropertyEventCount: (instanceUUID: string, propertyName: string) => number;
-}
+import {InstanceItem, InstanceListState, PropertyItem} from "./InstanceListView";
 
 export const selectInstanceList = createSelector(
   [instanceInfoListSelector, classInfoListSelector, methodCallInfoListSelector, persistentStateSelector],

@@ -1,11 +1,11 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 
-export interface SidebarState {
+export interface PropertyInspectorReducerState {
   instanceUUID: string;
   propertyName: string;
 }
 
-const initialState: SidebarState = {
+const initialState: PropertyInspectorReducerState = {
   instanceUUID: "",
   propertyName: "",
 }
@@ -15,8 +15,8 @@ export interface PropertyInspectorNavArguments {
   propertyName: string;
 }
 
-const sidebarSlice = createSlice({
-  name: 'sidebar',
+const propertyInspectorSlice = createSlice({
+  name: 'propertyInspector',
   initialState: initialState,
   reducers: {
     openPropertyInspector: (state, action: PayloadAction<PropertyInspectorNavArguments>) => {
@@ -26,7 +26,7 @@ const sidebarSlice = createSlice({
   }
 });
 
-export const sidebarActions = sidebarSlice.actions;
-export const sidebarReducer = sidebarSlice.reducer;
+export const propertyInspectorActions = propertyInspectorSlice.actions;
+export const propertyInspectorReducer = propertyInspectorSlice.reducer;
 
-export const sidebarStateSelector = (state: any) => state.sidebar as SidebarState;
+export const propertyInspectorReducerStateSelector = (state: any) => state.propertyInspector as PropertyInspectorReducerState;

@@ -1,5 +1,3 @@
-import {PropertyInfo} from "../data/RegisterInstance";
-
 export type IncomingEvents = {
   error: string;
   register: RegisterInstance;
@@ -20,6 +18,14 @@ export type RegisterInstance = {
   properties: PropertyInfo[];
   registeredAt: number;
 }
+
+interface PropertyInfo {
+  name: string;
+  debuggable: boolean;
+  propertyType: string;
+  valueType: string;
+}
+
 
 export type NotifyMethodCall = {
   instanceUUID: string;

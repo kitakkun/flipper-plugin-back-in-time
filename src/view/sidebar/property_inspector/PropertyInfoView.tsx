@@ -1,6 +1,6 @@
 import {Table, Typography} from "antd";
 import React from "react";
-import {PropertyInfo} from "../../data/ClassInfo";
+import {PropertyInfo} from "../../../data/ClassInfo";
 
 type PropertyInfoTableProps = {
   propertyInfo: PropertyInfo;

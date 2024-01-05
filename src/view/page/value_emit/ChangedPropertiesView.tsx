@@ -6,7 +6,7 @@ import {ClassInfo} from "../../../data/ClassInfo";
 import {ColumnsType} from "antd/lib/table";
 import ReactJson from "@microlink/react-json-view";
 
-type TargetValueChangeTableProps = {
+type ChangedPropertiesViewProps = {
   classInfo: ClassInfo;
   methodCallInfo: MethodCallInfo;
   onClickEmitValue: (propertyName: string, value: string) => void;
@@ -19,7 +19,7 @@ type ValueChangeItem = {
   value: any;
 }
 
-export function ChangedPropertiesView({classInfo, methodCallInfo, onClickEmitValue, onClickEditAndEmitValue}: TargetValueChangeTableProps) {
+export function ChangedPropertiesView({classInfo, methodCallInfo, onClickEmitValue, onClickEditAndEmitValue}: ChangedPropertiesViewProps) {
   const dataSource: ValueChangeItem[] = methodCallInfo.valueChanges.map((valueChange) => {
     const property = classInfo.properties.find((property) => property.name === valueChange.propertyName)!;
     const jsonValue = JSON.parse(valueChange.value);

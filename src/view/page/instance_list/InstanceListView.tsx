@@ -2,8 +2,25 @@ import React from "react";
 import {Button, Collapse, CollapsePanelProps, Switch, Typography} from "antd";
 import {ReloadOutlined} from "@ant-design/icons";
 import {Layout, theme} from "flipper-plugin";
-import {InstanceListState} from "./InstanceListSelector";
 import {PropertyListView} from "./PropertyListView";
+
+export interface InstanceItem {
+  name: string;
+  uuid: string;
+  properties: PropertyItem[];
+}
+
+export interface PropertyItem {
+  name: string;
+  type: string;
+  debuggable: boolean;
+}
+
+export interface InstanceListState {
+  instances: InstanceItem[];
+  showNonDebuggableProperty: boolean;
+  getPropertyEventCount: (instanceUUID: string, propertyName: string) => number;
+}
 
 type InstanceListProps = {
   state: InstanceListState;

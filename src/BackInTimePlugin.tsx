@@ -9,9 +9,8 @@ import {
   OutgoingEvents
 } from "./events/FlipperOutgoingEvents";
 import {configureStore, Dispatch, Store} from "@reduxjs/toolkit";
-import {flipperReducer} from "./reducer/flipperReducer";
 import {appActions, appReducer} from "./reducer/appReducer";
-import {sidebarReducer} from "./reducer/sidebarReducer";
+import {propertyInspectorReducer} from "./view/sidebar/property_inspector/propertyInspectorReducer";
 import {rawEventLogReducer} from "./view/page/raw_logs/RawEventLogReducer";
 import {valueEmitReducer} from "./view/page/value_emit/ValueEmitReducer";
 import {editAndEmitValueReducer} from "./view/page/edited_value_emitter/EditAndEmitValueReducer";
@@ -38,9 +37,8 @@ function configurePluginStore(): Store {
     reducer: {
       app: appReducer,
       persistentState: persistentStateReducer(),
-      flipper: flipperReducer,
       rawEventLog: rawEventLogReducer,
-      sidebar: sidebarReducer,
+      propertyInspector: propertyInspectorReducer,
       valueEmit: valueEmitReducer,
       editAndEmitValue: editAndEmitValueReducer,
     },

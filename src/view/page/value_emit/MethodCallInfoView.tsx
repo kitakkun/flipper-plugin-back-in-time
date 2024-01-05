@@ -1,14 +1,14 @@
 import React from "react";
 import {Table, Typography} from "antd";
 
-type MethodCallInfoProps = {
+type MethodCallInfoViewProps = {
   instanceUUID: string;
   methodName: string;
   methodCallUUID: string;
   calledAt: number;
 }
 
-export function MethodCallInfoView({instanceUUID, methodName, methodCallUUID, calledAt}: MethodCallInfoProps) {
+export function MethodCallInfoView({instanceUUID, methodName, methodCallUUID, calledAt}: MethodCallInfoViewProps) {
   const dataSource = [
     {
       name: "instanceUUID",

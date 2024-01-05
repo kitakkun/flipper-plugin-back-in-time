@@ -1,6 +1,6 @@
 import {Badge, List} from "antd";
 import React from "react";
-import {InstanceItem} from "./InstanceListSelector";
+import {InstanceItem} from "./InstanceListView";
 
 export function PropertyListView({instance, onClickProperty, getNumOfEvents, showNonDebuggableProperty}: {
   instance: InstanceItem,

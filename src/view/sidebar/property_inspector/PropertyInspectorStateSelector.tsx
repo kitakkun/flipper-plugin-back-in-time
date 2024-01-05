@@ -1,10 +1,10 @@
 import {createSelector} from "@reduxjs/toolkit";
 import {classInfoListSelector, instanceInfoListSelector, methodCallInfoListSelector} from "../../../reducer/appReducer";
 import {PropertyInspectorState} from "./PropertyInspectorView";
-import {sidebarStateSelector} from "../../../reducer/sidebarReducer";
+import {propertyInspectorReducerStateSelector} from "./propertyInspectorReducer";
 
 export const propertyInspectorStateSelector = createSelector(
-  [instanceInfoListSelector, classInfoListSelector, methodCallInfoListSelector, sidebarStateSelector],
+  [instanceInfoListSelector, classInfoListSelector, methodCallInfoListSelector, propertyInspectorReducerStateSelector],
   (instanceInfoList, classInfoList, methodCallInfoList, state) => {
     const instanceInfo = instanceInfoList.find((info) => info.uuid == state?.instanceUUID)
     const classInfo = classInfoList.find((info) => info.name == instanceInfo?.className);

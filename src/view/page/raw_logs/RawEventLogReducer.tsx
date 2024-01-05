@@ -1,10 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit";
-import {RawEventLog} from "../../../data/RawEventLog";
 import {appActions} from "../../../reducer/appReducer";
-
-export interface RawEventLogState {
-  logs: RawEventLog[];
-}
+import {RawEventLogState} from "./RawLogView";
 
 const initialState: RawEventLogState = {
   logs: [],

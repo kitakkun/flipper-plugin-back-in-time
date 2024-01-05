@@ -1,16 +1,8 @@
 import {createSelector, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {classInfoListSelector, instanceInfoListSelector} from "../../../reducer/appReducer";
+import {EditAndEmitState} from "./EditAndEmitValueView";
 
-export interface EditAndEmitState {
-  initialValue: any;
-  editingValue: any;
-  open: boolean;
-  instanceUUID: string;
-  propertyName: string;
-  valueType: string | undefined;
-}
-
-export interface EditAndEmitReducerState {
+interface EditAndEmitReducerState {
   initialValue: any;
   editingValue: any;
   open: boolean;

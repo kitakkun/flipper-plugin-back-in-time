@@ -2,12 +2,16 @@ import React from "react";
 import {RawEventLog} from "../../../data/RawEventLog";
 import {createDataSource, DataTable, DataTableColumn, Layout, theme} from "flipper-plugin";
 
-type RawLogPageProps = {
-  rawEventLog: RawEventLog[];
+export interface RawEventLogState {
+  logs: RawEventLog[];
 }
 
-export function RawLogView({rawEventLog}: RawLogPageProps) {
-  const dataSource = createDataSource(rawEventLog.map((log) => {
+type RawLogPageProps = {
+  state: RawEventLogState;
+}
+
+export function RawLogView({state}: RawLogPageProps) {
+  const dataSource = createDataSource(state.logs.map((log) => {
     return {
       label: log.label,
       payload: JSON.stringify(log.payload),

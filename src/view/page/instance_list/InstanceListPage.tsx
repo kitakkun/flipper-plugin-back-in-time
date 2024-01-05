@@ -4,7 +4,7 @@ import {InstanceListView} from "./InstanceListView";
 import {persistentStateActions} from "../../../reducer/PersistentStateReducer";
 import {selectInstanceList} from "./InstanceListSelector";
 import {appActions} from "../../../reducer/appReducer";
-import {sidebarActions} from "../../../reducer/sidebarReducer";
+import {propertyInspectorActions} from "../../sidebar/property_inspector/propertyInspectorReducer";
 
 export function InstanceListPage() {
   const state = useSelector(selectInstanceList);
@@ -16,7 +16,7 @@ export function InstanceListPage() {
       const instanceInfo = state.instances.find((instance) => instance.uuid == instanceUUID);
       const propertyInfo = instanceInfo?.properties?.find((property) => property.name == propertyName);
       if (!instanceInfo || !propertyInfo) return;
-      dispatch(sidebarActions.openPropertyInspector({
+      dispatch(propertyInspectorActions.openPropertyInspector({
         instanceUUID: instanceInfo.uuid,
         propertyName: propertyInfo.name,
       }))

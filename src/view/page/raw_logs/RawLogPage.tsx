@@ -6,5 +6,5 @@ import {rawEventLogStateSelector} from "./RawEventLogReducer";
 export default function RawLogPage() {
   const state = useSelector(rawEventLogStateSelector);
 
-  return <RawLogView rawEventLog={state.logs}/>;
+  return <RawLogView state={state}/>;
 }

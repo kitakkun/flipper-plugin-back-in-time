@@ -1,7 +1,7 @@
 import React from "react";
-import {InstanceInfoView} from "../InstanceInfoView";
-import {PropertyInfoView} from "../PropertyInfoView";
-import {PropertyValueChangesView} from "../PropertyValueChangesView";
+import {InstanceInfoView} from "./InstanceInfoView";
+import {PropertyInfoView} from "./PropertyInfoView";
+import {PropertyValueChangesView} from "./PropertyValueChangesView";
 import {Layout, theme} from "flipper-plugin";
 import {MethodCallInfo} from "../../../data/MethodCallInfo";
 import {InstanceInfo} from "../../../data/InstanceInfo";

@@ -1,6 +1,6 @@
 import {Table, Typography} from "antd";
 import React from "react";
-import {InstanceInfo} from "../../data/InstanceInfo";
+import {InstanceInfo} from "../../../data/InstanceInfo";
 
 type InstanceInfoProps = {
   instanceInfo: InstanceInfo;
