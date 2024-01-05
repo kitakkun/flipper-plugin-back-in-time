@@ -14,12 +14,12 @@ export function InstanceListPage() {
     onSelectProperty={(instanceUUID, propertyName) => {
       const instanceInfo = state.instances.find((instance) => instance.instanceUUID == instanceUUID);
       const propertyInfo = instanceInfo?.properties?.find((property) => property.name == propertyName);
-      const valueChanges = state.valueChangedEvents.filter((event) => event.instanceUUID == instanceUUID && event.propertyName == propertyName);
+      const methodCallInfoList = state.methodCallInfoList.filter((event) => event.instanceUUID == instanceUUID);
       if (!instanceInfo || !propertyInfo) return;
       dispatch(sidebarActions.openPropertyInspector({
         selectedInstance: instanceInfo,
         selectedPropertyInfo: propertyInfo,
-        selectedPropertyValueChangeLog: valueChanges,
+        selectedPropertyRelevantCalls: methodCallInfoList,
       }))
     }}
     onClickRefresh={() => {

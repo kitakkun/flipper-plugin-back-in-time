@@ -4,11 +4,12 @@ import {DebuggableStateHolderInfo} from "../data/RegisterInstance";
 import {CheckInstanceAlive, CheckInstanceAliveResponse, ForceSetPropertyValue} from "../events/FlipperOutgoingEvents";
 import {RawEventLog} from "../data/RawEventLog";
 import {FlipperPendingEvent} from "../events/FlipperPendingEvent";
+import {MethodCallInfo} from "../data/MethodCallInfo";
 
 export type FlipperEvent = {
   registerInstance: DebuggableStateHolderInfo[];
   valueChanges: NotifyValueChange[];
-  methodCalls: NotifyMethodCall[];
+  methodCalls: MethodCallInfo[];
   pendingForceSetPropertyValueEvent: FlipperPendingEvent<ForceSetPropertyValue> | null;
   pendingRefreshInstanceAliveStatusEvent: FlipperPendingEvent<CheckInstanceAlive> | null;
 }
@@ -28,11 +29,20 @@ const flipperEventSlice = createSlice({
     registerInstance: (state, action: PayloadAction<RegisterInstance>) => {
       state.registerInstance.push({...action.payload, alive: true});
     },
-    notifyValueChange: (state, action: PayloadAction<NotifyValueChange>) => {
-      state.valueChanges.push(action.payload);
-    },
     notifyMethodCall: (state, action: PayloadAction<NotifyMethodCall>) => {
-      state.methodCalls.push(action.payload);
+      state.methodCalls.push({
+        callUUID: action.payload.methodCallUUID,
+        instanceUUID: action.payload.instanceUUID,
+        methodName: action.payload.methodName,
+        calledAt: action.payload.calledAt,
+        valueChanges: [],
+      });
+    },
+    notifyValueChange: (state, action: PayloadAction<NotifyValueChange>) => {
+      state.methodCalls
+        .find((methodCall) => methodCall.callUUID == action.payload.methodCallUUID)
+        ?.valueChanges
+        ?.push({propertyName: action.payload.propertyName, value: action.payload.value});
     },
     updateInstanceAliveStatus: (state, action: PayloadAction<CheckInstanceAliveResponse>) => {
       const response = action.payload
@@ -73,5 +83,5 @@ export const flipperReducer = flipperEventSlice.reducer;
 
 export const selectRegisteredInstances = (state: any) => state.flipper.registerInstance as DebuggableStateHolderInfo[];
 export const selectValueChanges = (state: any) => state.flipper.valueChanges as NotifyValueChange[];
-export const selectMethodCalls = (state: any) => state.flipper.methodCalls as NotifyMethodCall[];
+export const selectMethodCalls = (state: any) => state.flipper.methodCalls as MethodCallInfo[];
 export const selectRawEvents = (state: any) => state.flipper.rawEvents as RawEventLog[];

@@ -1,45 +1,60 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {DebuggableStateHolderInfo} from "../../../data/RegisterInstance";
 import {flipperActions} from "../../../reducer/flipperReducer";
-import {NotifyValueChange} from "../../../events/FlipperIncomingEvents";
+import {MethodCallInfo} from "../../../data/MethodCallInfo";
 
 export interface InstanceListState {
   instances: DebuggableStateHolderInfo[];
-  valueChangedEvents: NotifyValueChange[];
+  methodCallInfoList: MethodCallInfo[];
   nonDebuggablePropertyVisible: boolean;
 }
 
 const initialState: InstanceListState = {
   instances: [],
-  valueChangedEvents: [],
+  methodCallInfoList: [],
   nonDebuggablePropertyVisible: true,
 };
 
 const instanceListSlice = createSlice({
-  name: "instanceList",
-  initialState: initialState,
-  reducers: {
-    updateNonDebuggablePropertyVisibility: (state, action) => {
-      state.nonDebuggablePropertyVisible = action.payload;
-    }
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(flipperActions.registerInstance, (state, action) => {
-        state.instances.push({...action.payload, alive: true});
-      })
-      .addCase(flipperActions.updateInstanceAliveStatus, (state, action) => {
-        Object.entries(action.payload.isAlive).forEach(([instanceUUID, alive]) => {
-          const instance = state.instances.find((info) => info.instanceUUID == instanceUUID);
-          if (!instance) return;
-          instance.alive = alive;
+    name: "instanceList",
+    initialState: initialState,
+    reducers: {
+      updateNonDebuggablePropertyVisibility: (state, action) => {
+        state.nonDebuggablePropertyVisible = action.payload;
+      }
+    },
+    extraReducers: (builder) => {
+      builder
+        .addCase(flipperActions.registerInstance, (state, action) => {
+          state.instances.push({...action.payload, alive: true});
+        })
+        .addCase(flipperActions.updateInstanceAliveStatus, (state, action) => {
+          Object.entries(action.payload.isAlive).forEach(([instanceUUID, alive]) => {
+            const instance = state.instances.find((info) => info.instanceUUID == instanceUUID);
+            if (!instance) return;
+            instance.alive = alive;
+          });
+        })
+        .addCase(flipperActions.notifyMethodCall, (state, action) => {
+          state.methodCallInfoList.push({
+            methodName: action.payload.methodName,
+            instanceUUID: action.payload.instanceUUID,
+            callUUID: action.payload.methodCallUUID,
+            calledAt: action.payload.calledAt,
+            valueChanges: [],
+          });
+        })
+        .addCase(flipperActions.notifyValueChange, (state, action) => {
+          state.methodCallInfoList.find((event) => event.callUUID == action.payload.methodCallUUID)
+            ?.valueChanges
+            ?.push({
+              propertyName: action.payload.propertyName,
+              value: action.payload.value,
+            });
         });
-      })
-      .addCase(flipperActions.notifyValueChange, (state, action) => {
-        state.valueChangedEvents.push(action.payload);
-      });
-  }
-});
+    }
+  })
+;
 
 export const instanceListActions = instanceListSlice.actions;
 export const instanceListReducer = instanceListSlice.reducer;

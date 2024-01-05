@@ -1,28 +1,29 @@
 import MethodCallInfo from "./MethodCallInfo";
-import TargetValueChangeTable from "./TargetValueChangeTable";
+import {TargetValueChangeTable} from "./TargetValueChangeTable";
 import React from "react";
-import {NotifyMethodCall, NotifyValueChange} from "../../../events/FlipperIncomingEvents";
-import {DebuggableStateHolderInfo} from "../../../data/RegisterInstance";
 import {Layout, theme} from "flipper-plugin";
+import {ValueEmitState} from "./ValueEmitReducer";
 
 type ValueEmitViewProps = {
-  instance: DebuggableStateHolderInfo;
-  methodCall: NotifyMethodCall;
-  valueChanges: NotifyValueChange[];
-  onValueEmit: (instanceUUID: string, propertyName: string, value: string, valueType: string) => void;
+  state: ValueEmitState,
+  onValueEmit: (propertyName: string, value: string) => void;
 };
 
-export function ValueEmitView({onValueEmit, methodCall, instance, valueChanges}: ValueEmitViewProps) {
+export function ValueEmitView({onValueEmit, state}: ValueEmitViewProps) {
+  if (!state.instanceInfo || !state.methodCallInfo) {
+    return null;
+  }
+
   return <Layout.Container padh={theme.inlinePaddingH} padv={theme.inlinePaddingV} gap={theme.space.medium}>
     <MethodCallInfo
-      methodCallUUID={methodCall.methodCallUUID}
-      instanceUUID={methodCall.instanceUUID}
-      calledAt={methodCall.calledAt}
-      methodName={methodCall.methodName}
+      methodCallUUID={state.methodCallInfo?.callUUID}
+      instanceUUID={state.instanceInfo.instanceUUID}
+      calledAt={state.methodCallInfo.calledAt}
+      methodName={state.methodCallInfo.methodName}
     />
     <TargetValueChangeTable
-      instance={instance}
-      valueChanges={valueChanges}
+      instance={state.instanceInfo}
+      methodCallInfo={state.methodCallInfo}
       onClickEmitValue={onValueEmit}
     />
   </Layout.Container>;

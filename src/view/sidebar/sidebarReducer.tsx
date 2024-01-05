@@ -1,11 +1,11 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {DebuggableStateHolderInfo, PropertyInfo} from "../../data/RegisterInstance";
-import {NotifyValueChange} from "../../events/FlipperIncomingEvents";
+import {MethodCallInfo} from "../../data/MethodCallInfo";
 
 export interface PropertyInspectorState {
   selectedInstance: DebuggableStateHolderInfo,
   selectedPropertyInfo: PropertyInfo,
-  selectedPropertyValueChangeLog: NotifyValueChange[],
+  selectedPropertyRelevantCalls: MethodCallInfo[],
 }
 
 export interface SidebarState {
@@ -16,11 +16,16 @@ const initialState: SidebarState = {
   propertyInspectorState: null,
 }
 
+function resetState(sidebarState: SidebarState) {
+  sidebarState.propertyInspectorState = null;
+}
+
 const sidebarSlice = createSlice({
   name: 'sidebar',
   initialState: initialState,
   reducers: {
     openPropertyInspector: (state, action: PayloadAction<PropertyInspectorState>) => {
+      resetState(state);
       state.propertyInspectorState = action.payload;
     }
   }

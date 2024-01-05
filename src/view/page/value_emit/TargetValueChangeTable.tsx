@@ -1,29 +1,29 @@
 import React from "react";
-import {NotifyValueChange} from "../../../events/FlipperIncomingEvents";
-import {DebuggableStateHolderInfo, PropertyInfo} from "../../../data/RegisterInstance";
+import {DebuggableStateHolderInfo} from "../../../data/RegisterInstance";
 import {Table, Typography} from "antd";
 import {EmitButton} from "./EmitButton";
+import {MethodCallInfo} from "../../../data/MethodCallInfo";
 
 type TargetValueChangeTableProps = {
   instance: DebuggableStateHolderInfo;
-  valueChanges: NotifyValueChange[];
-  onClickEmitValue: (instanceUUID: string, propertyName: string, value: string, valueType: string) => void;
+  methodCallInfo: MethodCallInfo;
+  onClickEmitValue: (propertyName: string, value: string) => void;
 };
 
-export default ({instance, valueChanges, onClickEmitValue}: TargetValueChangeTableProps) => {
+export function TargetValueChangeTable({instance, methodCallInfo, onClickEmitValue}: TargetValueChangeTableProps) {
   const propertyInfo = (propertyName: string) => {
     return instance.properties.find((property) => property.name === propertyName);
   };
 
-  const onClick = (propertyInfo: PropertyInfo, valueChangeEvent: NotifyValueChange) => {
-    onClickEmitValue(instance.instanceUUID, propertyInfo.name, valueChangeEvent.value, propertyInfo.valueType);
+  const onClick = (propertyName: string, value: string) => {
+    onClickEmitValue(propertyName, value);
   }
 
-  const dataSource = valueChanges.map((valueChange) => {
+  const dataSource = methodCallInfo.valueChanges.map((valueChange) => {
     const property = propertyInfo(valueChange.propertyName)!;
     return {
       action: <EmitButton
-        onClickEmitValue={() => onClick(property, valueChange)}
+        onClickEmitValue={() => onClick(property.name, valueChange.value)}
         onClickEditValue={() => {/* TODO */
         }}
       />,

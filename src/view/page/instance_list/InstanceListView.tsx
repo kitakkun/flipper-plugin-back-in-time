@@ -21,7 +21,9 @@ export function InstanceListView(
   }: InstanceListProps
 ) {
   const eventsByInstance = (instanceUUID: string) => {
-    const events = state.valueChangedEvents.filter((event) => event.instanceUUID == instanceUUID);
+    const events = state.methodCallInfoList
+      .filter((event) => event.instanceUUID == instanceUUID)
+      .flatMap((event) => event.valueChanges);
     if (!events) return [];
     return events;
   }
