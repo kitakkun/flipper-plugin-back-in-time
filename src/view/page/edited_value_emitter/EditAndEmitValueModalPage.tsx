@@ -12,6 +12,7 @@ export function EditAndEmitValueModalPage() {
     centered={true}
     open={state.open}
     title={"Edit and Emit Value"}
+    width={"80%"}
     cancelText={"Cancel"}
     okText={"Emit Edited Value"}
     onOk={() => {
