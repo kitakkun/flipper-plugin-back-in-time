@@ -16,7 +16,7 @@ export function ValueEmitView({state, onValueEmit, onEditAndEmitValue}: ValueEmi
   }
 
   return (
-    <Layout.Container padh={theme.inlinePaddingH} padv={theme.inlinePaddingV} gap={theme.space.medium}>
+    <Layout.Container padh={theme.inlinePaddingH} padv={theme.inlinePaddingV} gap={theme.space.medium} grow={true}>
       <MethodCallInfo
         methodCallUUID={state.methodCallInfo?.callUUID}
         instanceUUID={state.instanceInfo.instanceUUID}

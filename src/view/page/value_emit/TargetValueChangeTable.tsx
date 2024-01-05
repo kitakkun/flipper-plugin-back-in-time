@@ -3,6 +3,7 @@ import {DebuggableStateHolderInfo} from "../../../data/RegisterInstance";
 import {Table, Typography} from "antd";
 import {EmitButton} from "./EmitButton";
 import {MethodCallInfo} from "../../../data/MethodCallInfo";
+import ReactJson from "@microlink/react-json-view";
 
 type TargetValueChangeTableProps = {
   instance: DebuggableStateHolderInfo;
@@ -24,9 +25,11 @@ export function TargetValueChangeTable({instance, methodCallInfo, onClickEmitVal
         onClickEditValue={() => onClickEditAndEmitValue(property.name, valueChange.value)}
       />,
       name: property.name,
-      type: property.propertyType,
-      valueType: property.valueType,
-      value: valueChange.value,
+      value: <ReactJson
+        src={JSON.parse(valueChange.value)}
+        name={null}
+        theme={"rjv-default"}
+      />,
     };
   }).filter((value) => value != null);
 
@@ -35,33 +38,26 @@ export function TargetValueChangeTable({instance, methodCallInfo, onClickEmitVal
       title: 'action',
       dataIndex: 'action',
       key: 'action',
+      width: 100,
     },
     {
       title: 'name',
       dataIndex: 'name',
       key: 'name',
-    },
-    {
-      title: 'type',
-      dataIndex: 'type',
-      key: 'type',
-    },
-    {
-      title: 'value type',
-      dataIndex: 'valueType',
-      key: 'valueType',
+      width: 120,
     },
     {
       title: 'value',
       dataIndex: 'value',
       key: 'value',
+      width: "100%",
     },
-  ]
+  ];
 
   return (
     <>
       <Typography.Title level={5}>Value Changes</Typography.Title>
-      <Table dataSource={dataSource} columns={columns} scroll={{x: true}}/>
+      <Table dataSource={dataSource} columns={columns} scroll={{x: true}} size={"small"}/>
     </>
   );
 }
