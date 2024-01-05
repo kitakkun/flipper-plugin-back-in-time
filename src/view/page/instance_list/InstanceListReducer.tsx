@@ -6,23 +6,17 @@ import {MethodCallInfo} from "../../../data/MethodCallInfo";
 export interface InstanceListState {
   instances: DebuggableStateHolderInfo[];
   methodCallInfoList: MethodCallInfo[];
-  nonDebuggablePropertyVisible: boolean;
 }
 
 const initialState: InstanceListState = {
   instances: [],
   methodCallInfoList: [],
-  nonDebuggablePropertyVisible: true,
 };
 
 const instanceListSlice = createSlice({
     name: "instanceList",
     initialState: initialState,
-    reducers: {
-      updateNonDebuggablePropertyVisibility: (state, action) => {
-        state.nonDebuggablePropertyVisible = action.payload;
-      }
-    },
+    reducers: {},
     extraReducers: (builder) => {
       builder
         .addCase(flipperActions.registerInstance, (state, action) => {

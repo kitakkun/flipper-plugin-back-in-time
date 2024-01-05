@@ -2,15 +2,18 @@ import {useDispatch, useSelector} from "react-redux";
 import {flipperActions} from "../../../reducer/flipperReducer";
 import React from "react";
 import {InstanceListView} from "./InstanceListView";
-import {instanceListActions, instanceListStateSelector} from "./InstanceListReducer";
+import {instanceListStateSelector} from "./InstanceListReducer";
 import {sidebarActions} from "../../sidebar/sidebarReducer";
+import {persistentStateActions, persistentStateSelector} from "../../../reducer/PersistentStateReducer";
 
 export function InstanceListPage() {
   const state = useSelector(instanceListStateSelector);
+  const persistentState = useSelector(persistentStateSelector);
   const dispatch = useDispatch();
 
   return <InstanceListView
     state={state}
+    nonDebuggablePropertyVisible={persistentState.showNonDebuggableProperty}
     onSelectProperty={(instanceUUID, propertyName) => {
       const instanceInfo = state.instances.find((instance) => instance.instanceUUID == instanceUUID);
       const propertyInfo = instanceInfo?.properties?.find((property) => property.name == propertyName);
@@ -26,7 +29,7 @@ export function InstanceListPage() {
       dispatch(flipperActions.sendRefreshInstanceAliveStatus({instanceUUIDs: state.instances.map((info) => info.instanceUUID)}));
     }}
     onChangeNonDebuggablePropertyVisible={(visible) => {
-      dispatch(instanceListActions.updateNonDebuggablePropertyVisibility(visible));
+      dispatch(persistentStateActions().updateNonDebuggablePropertyVisibility(visible));
     }}
   />;
 }

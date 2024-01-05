@@ -7,6 +7,7 @@ import {InstanceListState} from "./InstanceListReducer";
 
 type InstanceListProps = {
   state: InstanceListState;
+  nonDebuggablePropertyVisible: boolean;
   onSelectProperty: (instanceUUID: string, propertyName: string) => void;
   onClickRefresh: () => void;
   onChangeNonDebuggablePropertyVisible: (visible: boolean) => void;
@@ -16,6 +17,7 @@ export function InstanceListView(
   {
     state,
     onSelectProperty,
+    nonDebuggablePropertyVisible,
     onClickRefresh,
     onChangeNonDebuggablePropertyVisible,
   }: InstanceListProps
@@ -32,7 +34,7 @@ export function InstanceListView(
     <Layout.Horizontal gap={theme.space.medium} style={{display: "flex", alignItems: "center"}}>
       show non-debuggable properties:
       <Switch
-        checked={state.nonDebuggablePropertyVisible}
+        checked={nonDebuggablePropertyVisible}
         onChange={(visible) => {
           onChangeNonDebuggablePropertyVisible(visible)
         }}
@@ -48,7 +50,7 @@ export function InstanceListView(
               onClickProperty={(propertyName) => {
                 onSelectProperty(instance.instanceUUID, propertyName);
               }}
-              nonDebuggablePropertyVisible={state.nonDebuggablePropertyVisible}
+              nonDebuggablePropertyVisible={nonDebuggablePropertyVisible}
               getNumOfEvents={(propertyName) => {
                 return eventsByInstance(instance.instanceUUID).filter((event) => event.propertyName == propertyName).length;
               }}

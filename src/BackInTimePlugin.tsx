@@ -1,6 +1,6 @@
 // Read more: https://fbflipper.com/docs/tutorial/js-custom#creating-a-first-plugin
 // API: https://fbflipper.com/docs/extending/flipper-plugin#pluginclient
-import {PluginClient} from "flipper-plugin";
+import {createState, PluginClient} from "flipper-plugin";
 import {IncomingEvents} from "./events/FlipperIncomingEvents";
 import {OutgoingEvents} from "./events/FlipperOutgoingEvents";
 import {configureStore} from "@reduxjs/toolkit";
@@ -11,11 +11,19 @@ import {sidebarReducer} from "./view/sidebar/sidebarReducer";
 import {rawEventLogReducer} from "./view/page/raw_logs/RawEventLogReducer";
 import {valueEmitReducer} from "./view/page/value_emit/ValueEmitReducer";
 import {editAndEmitValueReducer} from "./view/page/edited_value_emitter/EditAndEmitValueReducer";
+import {
+  AtomicPersistentState,
+  initPersistentStateSlice,
+  persistentStateReducer
+} from "./reducer/PersistentStateReducer";
 
 export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
+  initPersistentStateSlice(generatePersistentStates());
+
   const store = configureStore({
     reducer: {
       app: appReducer,
+      persistentState: persistentStateReducer(),
       flipper: flipperReducer,
       instanceList: instanceListReducer,
       rawEventLog: rawEventLogReducer,
@@ -26,6 +34,7 @@ export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
   });
 
   const dispatch = store.dispatch;
+
   client.onMessage("register", (event) => dispatch(flipperActions.registerInstance(event)));
   client.onMessage("notifyValueChange", (event) => dispatch(flipperActions.notifyValueChange(event)));
   client.onMessage("notifyMethodCall", (event) => dispatch(flipperActions.notifyMethodCall(event)));
@@ -48,4 +57,10 @@ export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
   });
 
   return {store};
+}
+
+function generatePersistentStates(): AtomicPersistentState {
+  return {
+    showNonDebuggableProperty: createState(true, {persist: "DebuggerPreferences.showNonDebuggableProperty", persistToLocalStorage: true}),
+  };
 }
