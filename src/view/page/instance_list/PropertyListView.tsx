@@ -17,13 +17,11 @@ export function PropertyListView({instance, onClickProperty, getNumOfEvents, sho
           onClick={() => onClickProperty(property.name)}
           hidden={!showNonDebuggableProperty && !property.debuggable}
         >
-          <>
-            <List.Item.Meta
-              title={property.name}
-              description={property.type}
-            />
-            <Badge count={getNumOfEvents(property.name)}/>
-          </>
+          <List.Item.Meta
+            title={property.name}
+            description={property.type}
+          />
+          <Badge count={getNumOfEvents(property.name)}/>
         </List.Item>
       )}
     />
