@@ -19,6 +19,7 @@ import {
   initPersistentStateSlice,
   persistentStateReducer
 } from "./reducer/PersistentStateReducer";
+import {rawLogInspectorReducer} from "./view/sidebar/raw_log_inspector/RawLogInspectorReducer";
 
 export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
   initPersistentStateSlice(generatePersistentStates());
@@ -41,6 +42,7 @@ function configurePluginStore(): Store {
       propertyInspector: propertyInspectorReducer,
       valueEmit: valueEmitReducer,
       editAndEmitValue: editAndEmitValueReducer,
+      rawLogInspector: rawLogInspectorReducer,
     },
   });
 }

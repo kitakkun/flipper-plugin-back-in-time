@@ -8,32 +8,37 @@ export interface RawEventLogState {
 
 type RawLogPageProps = {
   state: RawEventLogState;
+  onSelectLog: (log: RawEventLog) => void;
 }
 
-export function RawLogView({state}: RawLogPageProps) {
-  const dataSource = createDataSource(state.logs.map((log) => {
-    return {
-      label: log.label,
-      payload: JSON.stringify(log.payload),
-    }
-  }));
-
-  const columns: DataTableColumn[] = [
+export function RawLogView({state, onSelectLog}: RawLogPageProps) {
+  const dataSource = createDataSource(state.logs);
+  const columns: DataTableColumn<RawEventLog>[] = [
+    {
+      title: 'time',
+      key: 'time',
+    },
     {
       title: 'label',
       key: 'label',
-      width: 100,
     },
     {
       title: 'payload',
       key: 'payload',
-      width: "auto",
+      onRender: log => <>{JSON.stringify(log.payload)}</>
     },
   ];
 
+
   return (
     <Layout.Container padv={theme.inlinePaddingV} padh={theme.inlinePaddingH} gap={theme.space.medium} grow={true}>
-      <DataTable columns={columns} dataSource={dataSource}/>
+      <DataTable
+        columns={columns}
+        dataSource={dataSource}
+        onSelect={(record, _) => {
+          record && onSelectLog(record);
+        }}
+      />
     </Layout.Container>
   );
 }

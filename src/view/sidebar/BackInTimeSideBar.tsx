@@ -1,15 +1,17 @@
 import {DetailSidebar} from "flipper-plugin";
 import React from "react";
 import {useSelector} from "react-redux";
-import {propertyInspectorReducerStateSelector} from "./property_inspector/propertyInspectorReducer";
 import {PropertyInspectorPage} from "./property_inspector/PropertyInspectorPage";
+import {RawLogInspectorPage} from "./raw_log_inspector/RawLogInspectorPage";
+import {appStateSelector} from "../../reducer/appReducer";
 
 export function BackInTimeSideBar() {
-  const sidebarState = useSelector(propertyInspectorReducerStateSelector);
+  const appState = useSelector(appStateSelector);
 
   return (
     <DetailSidebar width={600}>
-      <PropertyInspectorPage/>
+      {appState.activeTabIndex == '1' && <PropertyInspectorPage/>}
+      {appState.activeTabIndex == '2' && <RawLogInspectorPage/>}
     </DetailSidebar>
   );
 }
