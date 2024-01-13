@@ -42,21 +42,21 @@ const appSlice = createSlice({
         // if new instance is registered, add it to instance list
         state.instanceInfoList.push({
           uuid: event.instanceUUID,
-          className: event.instanceType,
+          className: event.className,
           alive: true,
           registeredAt: event.registeredAt,
         });
-      } else if (existingInstanceInfo.className == event.superType) {
+      } else if (existingInstanceInfo.className == event.superClassName) {
         // if instance is already registered, update its class name
         // because subclass is registered after superclass
-        existingInstanceInfo.className = event.instanceType
+        existingInstanceInfo.className = event.className
       }
       // classInfo registration
-      const existingClassInfo = state.classInfoList.find((info) => info.name == event.instanceType);
+      const existingClassInfo = state.classInfoList.find((info) => info.name == event.className);
       if (existingClassInfo) return;
       state.classInfoList.push({
-        name: event.instanceType,
-        superClassName: event.superType,
+        name: event.className,
+        superClassName: event.superClassName,
         properties: event.properties.map((property) => (
           {
             name: property.name,

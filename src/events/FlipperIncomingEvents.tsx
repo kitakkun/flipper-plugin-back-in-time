@@ -14,8 +14,8 @@ export type IncomingEvents = {
  */
 export type RegisterInstance = {
   instanceUUID: string;
-  instanceType: string;
-  superType: string;
+  className: string;
+  superClassName: string;
   properties: PropertyInfo[];
   registeredAt: number;
 }

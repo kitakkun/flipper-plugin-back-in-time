@@ -12,7 +12,7 @@ test(`register event`, () => {
 
   sendEvent("register", {
     instanceUUID: "7fd43b42-f951-4307-a997-85f6074c17c9",
-    instanceType: "com.example.DummyViewModel",
+    className: "com.example.DummyViewModel",
     properties: [
       {
         name: "hoge",
