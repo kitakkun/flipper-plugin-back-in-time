@@ -7,6 +7,7 @@ import {PropertyListView} from "./PropertyListView";
 export interface InstanceItem {
   name: string;
   uuid: string;
+  superClassName: string;
   properties: PropertyItem[];
 }
 

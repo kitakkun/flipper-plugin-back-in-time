@@ -13,6 +13,7 @@ export const selectInstanceList = createSelector(
       if (!classInfo) return;
       return {
         name: classInfo.name,
+        superClassName: classInfo.superClassName,
         uuid: instance.uuid,
         properties: classInfo.properties.map((property) => (
           {

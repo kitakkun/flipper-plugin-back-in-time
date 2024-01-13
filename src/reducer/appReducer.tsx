@@ -36,14 +36,27 @@ const appSlice = createSlice({
   reducers: {
     register: (state, action: PayloadAction<RegisterInstance>) => {
       const event = action.payload;
-      state.instanceInfoList.push({
-        uuid: event.instanceUUID,
-        className: event.instanceType,
-        alive: true,
-        registeredAt: event.registeredAt,
-      });
+      const existingInstanceInfo = state.instanceInfoList.find((info) => info.uuid == event.instanceUUID);
+      // instance registration
+      if (!existingInstanceInfo) {
+        // if new instance is registered, add it to instance list
+        state.instanceInfoList.push({
+          uuid: event.instanceUUID,
+          className: event.instanceType,
+          alive: true,
+          registeredAt: event.registeredAt,
+        });
+      } else if (existingInstanceInfo.className == event.superType) {
+        // if instance is already registered, update its class name
+        // because subclass is registered after superclass
+        existingInstanceInfo.className = event.instanceType
+      }
+      // classInfo registration
+      const existingClassInfo = state.classInfoList.find((info) => info.name == event.instanceType);
+      if (existingClassInfo) return;
       state.classInfoList.push({
         name: event.instanceType,
+        superClassName: event.superType,
         properties: event.properties.map((property) => (
           {
             name: property.name,
@@ -52,7 +65,7 @@ const appSlice = createSlice({
             debuggable: property.debuggable,
           }
         )),
-      })
+      });
     },
     registerMethodCall: (state, action: PayloadAction<NotifyMethodCall>) => {
       const event = action.payload;

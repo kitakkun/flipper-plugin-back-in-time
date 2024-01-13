@@ -1,5 +1,6 @@
 export interface ClassInfo {
   name: string;
+  superClassName: string;
   properties: PropertyInfo[];
 }
 
