@@ -4,7 +4,7 @@ import {EmitButton} from "./EmitButton";
 import {MethodCallInfo} from "../../../data/MethodCallInfo";
 import {ClassInfo} from "../../../data/ClassInfo";
 import {ColumnsType} from "antd/lib/table";
-import ReactJson from "@microlink/react-json-view";
+import {MyJsonView} from "../../component/MyJsonView";
 
 type ChangedPropertiesViewProps = {
   classInfo: ClassInfo;
@@ -29,8 +29,7 @@ export function ChangedPropertiesView({classInfo, methodCallInfo, onClickEmitVal
         onClickEditValue={() => onClickEditAndEmitValue(property.name, valueChange.value)}
       />,
       name: property.name,
-      value: typeof jsonValue == "object" && jsonValue != null ?
-        <ReactJson src={jsonValue} name={null}/> : valueChange.value
+      value: <MyJsonView initialValue={jsonValue} onEdit={null}/>
     };
   });
 
