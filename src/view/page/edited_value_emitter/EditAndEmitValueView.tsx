@@ -23,7 +23,7 @@ export function EditAndEmitValueView({state, onEdit}: EditAndEmitValueViewProps)
       {/* リテラルでJSONビュアーが表示されないFIX（もう1箇所ある）*/}
       <Layout.Container>
         {
-          typeof state.initialValue == "object" ? <ReactJson
+          typeof state.initialValue == "object" && state.initialValue != null ? <ReactJson
             name={null}
             src={state.initialValue}
             theme={"rjv-default"}
@@ -35,7 +35,7 @@ export function EditAndEmitValueView({state, onEdit}: EditAndEmitValueViewProps)
                 return true;
               }
             }}
-          /> : <Input defaultValue={state.initialValue} onChange={(e) => onEdit(e.target.value)}/>
+          /> : <Input defaultValue={state.initialValue ?? "null"} onChange={(e) => onEdit(e.target.value)}/>
         }
       </Layout.Container>
       <Layout.Container>

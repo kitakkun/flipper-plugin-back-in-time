@@ -29,7 +29,8 @@ export function ChangedPropertiesView({classInfo, methodCallInfo, onClickEmitVal
         onClickEditValue={() => onClickEditAndEmitValue(property.name, valueChange.value)}
       />,
       name: property.name,
-      value: typeof jsonValue == "object" ? <ReactJson src={jsonValue} name={null}/> : valueChange.value
+      value: typeof jsonValue == "object" && jsonValue != null ?
+        <ReactJson src={jsonValue} name={null}/> : valueChange.value
     };
   });
 
