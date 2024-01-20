@@ -1,8 +1,9 @@
 import React from "react";
-import {Button, Collapse, CollapsePanelProps, Switch, Typography} from "antd";
+import {Button, Collapse, CollapsePanelProps, Row, Switch, Typography} from "antd";
 import {ReloadOutlined} from "@ant-design/icons";
 import {Layout, theme} from "flipper-plugin";
 import {PropertyListView} from "./PropertyListView";
+import {History} from "@mui/icons-material";
 
 export interface InstanceItem {
   name: string;
@@ -28,21 +29,22 @@ type InstanceListProps = {
   onSelectProperty: (instanceUUID: string, propertyName: string) => void;
   onClickRefresh: () => void;
   onChangeNonDebuggablePropertyVisible: (visible: boolean) => void;
+  onClickHistory: (instanceUUID: string) => void;
 }
 
-export function InstanceListView(
-  {
-    state,
-    onSelectProperty,
-    onClickRefresh,
-    onChangeNonDebuggablePropertyVisible,
-  }: InstanceListProps
-) {
+export function InstanceListView({state, onSelectProperty, onClickRefresh, onChangeNonDebuggablePropertyVisible, onClickHistory,}: InstanceListProps) {
   const items: CollapsePanelProps[] = state.instances.map((instance) => ({
     key: instance.uuid,
     header: <>
       <Typography.Title level={5}>{instance.name}</Typography.Title>
-      <Typography.Text>id: {instance.uuid}</Typography.Text>
+      <Row justify={"space-between"} align={"middle"}>
+        <Typography.Text>id: {instance.uuid}</Typography.Text>
+        <Button onClick={() => onClickHistory(instance.uuid)}>
+          <Row align={"middle"} gutter={theme.space.small}>
+            <History/>History
+          </Row>
+        </Button>
+      </Row>
     </>,
     children: <PropertyListView
       instance={instance}

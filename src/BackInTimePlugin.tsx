@@ -2,24 +2,16 @@
 // API: https://fbflipper.com/docs/extending/flipper-plugin#pluginclient
 import {createState, PluginClient} from "flipper-plugin";
 import {IncomingEvents} from "./events/FlipperIncomingEvents";
-import {
-  isCheckInstanceAlive,
-  isForceSetPropertyValue,
-  OutgoingEvent,
-  OutgoingEvents
-} from "./events/FlipperOutgoingEvents";
+import {isCheckInstanceAlive, isForceSetPropertyValue, OutgoingEvent, OutgoingEvents} from "./events/FlipperOutgoingEvents";
 import {configureStore, Dispatch, Store} from "@reduxjs/toolkit";
 import {appActions, appReducer} from "./reducer/appReducer";
 import {propertyInspectorReducer} from "./view/sidebar/property_inspector/propertyInspectorReducer";
 import {rawEventLogReducer} from "./view/page/raw_logs/RawEventLogReducer";
 import {valueEmitReducer} from "./view/page/value_emit/ValueEmitReducer";
 import {editAndEmitValueReducer} from "./view/page/edited_value_emitter/EditAndEmitValueReducer";
-import {
-  AtomicPersistentState,
-  initPersistentStateSlice,
-  persistentStateReducer
-} from "./reducer/PersistentStateReducer";
+import {AtomicPersistentState, initPersistentStateSlice, persistentStateReducer} from "./reducer/PersistentStateReducer";
 import {rawLogInspectorReducer} from "./view/sidebar/raw_log_inspector/RawLogInspectorReducer";
+import {backInTimeReducer} from "./view/page/backintime/BackInTimeReducer";
 
 export default (client: PluginClient<IncomingEvents, OutgoingEvents>) => {
   initPersistentStateSlice(generatePersistentStates());
@@ -43,6 +35,7 @@ function configurePluginStore(): Store {
       valueEmit: valueEmitReducer,
       editAndEmitValue: editAndEmitValueReducer,
       rawLogInspector: rawLogInspectorReducer,
+      backInTime: backInTimeReducer,
     },
   });
 }
