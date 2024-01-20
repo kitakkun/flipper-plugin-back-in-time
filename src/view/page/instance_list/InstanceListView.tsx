@@ -39,7 +39,10 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
       <Typography.Title level={5}>{instance.name}</Typography.Title>
       <Row justify={"space-between"} align={"middle"}>
         <Typography.Text>id: {instance.uuid}</Typography.Text>
-        <Button onClick={() => onClickHistory(instance.uuid)}>
+        <Button onClick={(event) => {
+          event.stopPropagation();
+          onClickHistory(instance.uuid);
+        }}>
           <Row align={"middle"} gutter={theme.space.small}>
             <History/>History
           </Row>
