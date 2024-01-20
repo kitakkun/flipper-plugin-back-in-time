@@ -6,6 +6,8 @@ import {BackInTimeView} from "./BackInTimeView";
 import {backInTimeStateSelector} from "./BackInTimeSelector";
 import {MethodCallHistoryInfo} from "./HistoryInfo";
 import {appActions} from "../../../reducer/appReducer";
+import {Simulate} from "react-dom/test-utils";
+
 
 export function BackInTimeModalPage() {
   const state = useSelector(backInTimeStateSelector);
@@ -24,19 +26,22 @@ export function BackInTimeModalPage() {
           state={state}
           onSelectHistory={(index) => {
             Modal.confirm({
+              centered: true,
               content: "Are you sure to go back in time here?",
               onOk: () => {
                 const methodCallHistories = state.histories.slice(0, index + 1)
                   .filter((history) => history.title == "methodCall")
                   .map((history) => history as MethodCallHistoryInfo);
                 const allValueChanges = methodCallHistories.flatMap((history) => history.valueChanges);
-                const propertyAndValues = distinctBy(allValueChanges, (change) => change.propertyName);
-                propertyAndValues.forEach((change) => {
+                const properties = distinctBy(allValueChanges.map((valueChange) => valueChange.propertyName), (name) => name);
+                properties.forEach((name) => {
+                  const value = allValueChanges.reverse().find((valueChange) => valueChange.propertyName == name)?.value;
+                  if (!value) return;
                   dispatch(appActions.forceSetPropertyValue(
                     {
                       instanceUUID: state.instanceUUID,
-                      propertyName: change.propertyName,
-                      value: change.value,
+                      propertyName: name,
+                      value: value,
                       valueType: "", // 使われてないから大丈夫
                     }
                   ));
