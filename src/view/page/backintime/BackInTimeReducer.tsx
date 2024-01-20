@@ -24,7 +24,7 @@ const backInTimeSlice = createSlice({
     close: (state) => {
       state.instanceUUID = undefined;
       state.open = false;
-    }
+    },
   },
 });
 
