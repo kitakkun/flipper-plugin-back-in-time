@@ -1,13 +1,11 @@
 import {Modal} from "antd";
 import React from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {backInTimeActions} from "./BackInTimeReducer";
 import {BackInTimeView} from "./BackInTimeView";
 import {backInTimeStateSelector} from "./BackInTimeSelector";
 import {MethodCallHistoryInfo} from "./HistoryInfo";
 import {appActions} from "../../../reducer/appReducer";
-import {Simulate} from "react-dom/test-utils";
-
+import {backInTimeActions} from "./BackInTimeReducer";
 
 export function BackInTimeModalPage() {
   const state = useSelector(backInTimeStateSelector);
@@ -21,6 +19,7 @@ export function BackInTimeModalPage() {
         title={"History Viewer"}
         width={"80%"}
         onCancel={() => dispatch(backInTimeActions.close())}
+        footer={null}
       >
         <BackInTimeView
           state={state}
