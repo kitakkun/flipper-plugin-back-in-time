@@ -1,9 +1,9 @@
 import React from "react";
-import {Button, Collapse, CollapsePanelProps, Row, Switch, Typography} from "antd";
-import {ReloadOutlined} from "@ant-design/icons";
+import {Badge, Button, Row, Switch, Tree, TreeDataNode, Typography} from "antd";
+import {DownOutlined, ReloadOutlined} from "@ant-design/icons";
 import {Layout, theme} from "flipper-plugin";
-import {PropertyListView} from "./PropertyListView";
 import {History} from "@mui/icons-material";
+import {Box} from "@mui/material";
 
 export interface InstanceItem {
   name: string;
@@ -33,28 +33,42 @@ type InstanceListProps = {
 }
 
 export function InstanceListView({state, onSelectProperty, onClickRefresh, onChangeNonDebuggablePropertyVisible, onClickHistory,}: InstanceListProps) {
-  const items: CollapsePanelProps[] = state.instances.map((instance) => ({
-    key: instance.uuid,
-    header: <>
-      <Typography.Title level={5}>{instance.name}</Typography.Title>
-      <Row justify={"space-between"} align={"middle"}>
-        <Typography.Text>id: {instance.uuid}</Typography.Text>
-        <Button onClick={(event) => {
-          event.stopPropagation();
-          onClickHistory(instance.uuid);
-        }}>
-          <Row align={"middle"} gutter={theme.space.small}>
+  const treeData: TreeDataNode[] = state.instances.map((instance) => ({
+    title: (
+      <Row
+        justify={"space-between"}
+        style={{padding: theme.space.small, backgroundColor: theme.backgroundWash}}
+        align={"middle"}
+      >
+        <Box>
+          <Typography.Title level={4}>{instance.name}</Typography.Title>
+          <Typography.Text type={"secondary"}>uuid: {instance.uuid}</Typography.Text>
+        </Box>
+        <Button
+          onClick={(event) => {
+            event.stopPropagation();
+            onClickHistory(instance.uuid);
+          }}
+        >
+          <Row align={"middle"} gutter={theme.space.medium}>
             <History/>History
           </Row>
         </Button>
       </Row>
-    </>,
-    children: <PropertyListView
-      instance={instance}
-      onClickProperty={(propertyName) => onSelectProperty(instance.uuid, propertyName)}
-      showNonDebuggableProperty={state.showNonDebuggableProperty}
-      getNumOfEvents={(propertyName) => state.getPropertyEventCount(instance.uuid, propertyName)}
-    />
+    ),
+    selectable: false,
+    key: instance.uuid,
+    children: instance.properties
+      .filter((property) => state.showNonDebuggableProperty || property.debuggable)
+      .map((property) => ({
+        title: (
+          <Row justify={"space-between"} align={"middle"} style={{padding: theme.space.small}}>
+            <Typography.Text>{property.name}</Typography.Text>
+            <Badge count={state.getPropertyEventCount(instance.uuid, property.name)}/>
+          </Row>
+        ),
+        key: `${instance.uuid}/${property.name}`
+      }))
   }));
 
   return <Layout.Container padv={theme.inlinePaddingV} padh={theme.inlinePaddingH} gap={theme.space.medium} grow={true}>
@@ -69,9 +83,16 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
       <Button onClick={onClickRefresh}>Refresh<ReloadOutlined/></Button>
     </Layout.Horizontal>
     <Layout.ScrollContainer>
-      <Collapse>
-        {items.map((item) => <Collapse.Panel {...item}/>)}
-      </Collapse>
+      <Tree
+        treeData={treeData}
+        onSelect={(selectedKeys, info) => {
+          const nodeInfo = info.node.key.toString().split("/");
+          nodeInfo.length == 2 && onSelectProperty(nodeInfo[0], nodeInfo[1]);
+        }}
+        blockNode
+        showLine
+        switcherIcon={<DownOutlined size={80}/>}
+      />
     </Layout.ScrollContainer>
   </Layout.Container>;
 }
