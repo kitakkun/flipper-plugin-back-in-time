@@ -2,13 +2,9 @@ import {createSelector, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import {ClassInfo} from "../data/ClassInfo";
 import {InstanceInfo} from "../data/InstanceInfo";
 import {MethodCallInfo} from "../data/MethodCallInfo";
-import {NotifyMethodCall, NotifyValueChange, RegisterInstance} from "../events/FlipperIncomingEvents";
-import {
-  CheckInstanceAlive,
-  CheckInstanceAliveResponse,
-  ForceSetPropertyValue,
-  OutgoingEvent
-} from "../events/FlipperOutgoingEvents";
+import {NotifyMethodCall, NotifyValueChange, RegisterInstance, RegisterRelationship} from "../events/FlipperIncomingEvents";
+import {CheckInstanceAlive, CheckInstanceAliveResponse, ForceSetPropertyValue, OutgoingEvent} from "../events/FlipperOutgoingEvents";
+import {DependencyInfo} from "../data/DependencyInfo";
 
 export interface AppState {
   activeTabIndex: string;
@@ -17,6 +13,7 @@ export interface AppState {
   classInfoList: ClassInfo[];
   instanceInfoList: InstanceInfo[];
   methodCallInfoList: MethodCallInfo[];
+  dependencyInfoList: DependencyInfo[];
 
   // to emit flipper events from everywhere
   pendingFlipperEventQueue: OutgoingEvent[];
@@ -27,6 +24,7 @@ const initialState: AppState = {
   classInfoList: [],
   instanceInfoList: [],
   methodCallInfoList: [],
+  dependencyInfoList: [],
   pendingFlipperEventQueue: [],
 };
 
@@ -66,6 +64,20 @@ const appSlice = createSlice({
           }
         )),
       });
+    },
+    registerRelationship: (state, action: PayloadAction<RegisterRelationship>) => {
+      const existingDependencyInfo = state.dependencyInfoList.find((info) => info.uuid == action.payload.parentUUID);
+      if (!existingDependencyInfo) {
+        state.dependencyInfoList.push({
+          uuid: action.payload.parentUUID,
+          dependsOn: [action.payload.childUUID],
+        });
+      } else {
+        state.dependencyInfoList.push({
+          uuid: action.payload.parentUUID,
+          dependsOn: [action.payload.childUUID, ...existingDependencyInfo.dependsOn],
+        });
+      }
     },
     registerMethodCall: (state, action: PayloadAction<NotifyMethodCall>) => {
       const event = action.payload;
@@ -115,6 +127,10 @@ export const appStateSelector = (state: any) => state.app as AppState;
 export const instanceInfoListSelector = createSelector(
   [appStateSelector],
   (state) => state.instanceInfoList
+);
+export const dependencyInfoListSelector = createSelector(
+  [appStateSelector],
+  (state) => state.dependencyInfoList
 );
 export const classInfoListSelector = createSelector(
   [appStateSelector],

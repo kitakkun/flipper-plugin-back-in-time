@@ -44,6 +44,7 @@ function observeIncomingEvents(dispatch: Dispatch, client: PluginClient<Incoming
   client.onMessage("register", (event) => dispatch(appActions.register(event)));
   client.onMessage("notifyValueChange", (event) => dispatch(appActions.registerValueChange(event)));
   client.onMessage("notifyMethodCall", (event) => dispatch(appActions.registerMethodCall(event)));
+  client.onMessage("registerRelationship", (event) => dispatch(appActions.registerRelationship(event)));
 }
 
 function observeOutgoingEvents(dispatch: Dispatch, store: Store, client: PluginClient<IncomingEvents, OutgoingEvents>) {

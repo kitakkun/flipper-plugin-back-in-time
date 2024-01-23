@@ -3,6 +3,7 @@ export type IncomingEvents = {
   register: RegisterInstance;
   notifyValueChange: NotifyValueChange;
   notifyMethodCall: NotifyMethodCall;
+  registerRelationship: RegisterRelationship;
 };
 
 /**
@@ -40,4 +41,9 @@ export type NotifyValueChange = {
   propertyName: string;
   value: string;
   methodCallUUID: string;
+}
+
+export interface RegisterRelationship {
+  parentUUID: string;
+  childUUID: string;
 }
