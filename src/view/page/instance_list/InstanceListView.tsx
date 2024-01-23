@@ -16,12 +16,12 @@ export interface PropertyItem {
   name: string;
   type: string;
   debuggable: boolean;
+  eventCount: number;
 }
 
 export interface InstanceListState {
   instances: InstanceItem[];
   showNonDebuggableProperty: boolean;
-  getPropertyEventCount: (instanceUUID: string, propertyName: string) => number;
 }
 
 type InstanceListProps = {
@@ -64,7 +64,7 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
         title: (
           <Row justify={"space-between"} align={"middle"} style={{padding: theme.space.small}}>
             <Typography.Text>{property.name}</Typography.Text>
-            <Badge count={state.getPropertyEventCount(instance.uuid, property.name)}/>
+            <Badge count={property.eventCount}/>
           </Row>
         ),
         key: `${instance.uuid}/${property.name}`

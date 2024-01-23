@@ -10,6 +10,9 @@ export const selectInstanceList = createSelector(
 
     const instances = aliveInstance.map((instance) => {
       const classInfo = classInfoList.find((info) => info.name == instance.className);
+      const allValueChangeEvents = methodCallInfoList
+        .filter((info) => info.instanceUUID == instance.uuid)
+        .flatMap((info) => info.valueChanges);
       if (!classInfo) return;
       return {
         name: classInfo.name,
@@ -20,30 +23,15 @@ export const selectInstanceList = createSelector(
             name: property.name,
             type: property.type,
             debuggable: property.debuggable,
+            eventCount: allValueChangeEvents.filter((event) => event.propertyName == property.name).length,
           } as PropertyItem
         )),
       } as InstanceItem;
     }).filter((instance) => instance != null) as InstanceItem[];
 
-    const propertyToEventCountMap = new Map<string, number>();
-    methodCallInfoList
-      .filter((info) => aliveInstance.some((instance) => instance.uuid == info.instanceUUID))
-      .forEach((event) => {
-        event.valueChanges.forEach((change) => {
-          const key = `${event.instanceUUID}-${change.propertyName}`;
-          const count = propertyToEventCountMap.get(key) ?? 0;
-          propertyToEventCountMap.set(key, count + 1);
-        })
-      });
-    const getPropertyEventCount = (instanceUUID: string, propertyName: string) => methodCallInfoList
-      .filter((info) => info.instanceUUID == instanceUUID)
-      .flatMap((info) => info.valueChanges.filter((change) => change.propertyName == propertyName))
-      .length;
-
     return {
       instances: instances,
       showNonDebuggableProperty: persistentState.showNonDebuggableProperty,
-      getPropertyEventCount: getPropertyEventCount,
     } as InstanceListState;
   }
 );
