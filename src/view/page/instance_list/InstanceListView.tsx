@@ -64,7 +64,12 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
         title: (
           <Row justify={"space-between"} align={"middle"} style={{padding: theme.space.small}}>
             <Typography.Text>{property.name}</Typography.Text>
-            <Badge count={property.eventCount}/>
+            <Row align={"middle"} gutter={theme.space.medium}>
+              <Typography.Text type={"secondary"}>{property.type}</Typography.Text>
+              <Row style={{width: 50}} align={"middle"} justify={"center"}>
+                <Badge count={property.eventCount}/>
+              </Row>
+            </Row>
           </Row>
         ),
         key: `${instance.uuid}/${property.name}`
