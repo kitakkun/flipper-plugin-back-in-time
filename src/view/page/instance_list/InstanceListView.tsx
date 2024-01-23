@@ -1,7 +1,7 @@
 import React from "react";
 import {Badge, Button, Row, Switch, Tree, TreeDataNode, Typography} from "antd";
 import {DownOutlined, ReloadOutlined} from "@ant-design/icons";
-import {Layout, theme} from "flipper-plugin";
+import {Layout, styled, theme} from "flipper-plugin";
 import {History} from "@mui/icons-material";
 import {Box} from "@mui/material";
 
@@ -32,12 +32,18 @@ type InstanceListProps = {
   onClickHistory: (instanceUUID: string) => void;
 }
 
+const StyledTree = styled(Tree)`
+  .ant-tree-switcher {
+    background: transparent !important;
+  }
+`;
+
 export function InstanceListView({state, onSelectProperty, onClickRefresh, onChangeNonDebuggablePropertyVisible, onClickHistory,}: InstanceListProps) {
   const treeData: TreeDataNode[] = state.instances.map((instance) => ({
+    style: {padding: theme.space.small, backgroundColor: theme.backgroundWash, borderRadius: theme.borderRadius},
     title: (
       <Row
         justify={"space-between"}
-        style={{padding: theme.space.small, backgroundColor: theme.backgroundWash}}
         align={"middle"}
       >
         <Box>
@@ -88,7 +94,7 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
       <Button onClick={onClickRefresh}>Refresh<ReloadOutlined/></Button>
     </Layout.Horizontal>
     <Layout.ScrollContainer>
-      <Tree
+      <StyledTree
         treeData={treeData}
         onSelect={(selectedKeys, info) => {
           const nodeInfo = info.node.key.toString().split("/");
@@ -96,7 +102,7 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
         }}
         blockNode
         showLine
-        switcherIcon={<DownOutlined size={80}/>}
+        switcherIcon={<DownOutlined/>}
       />
     </Layout.ScrollContainer>
   </Layout.Container>;

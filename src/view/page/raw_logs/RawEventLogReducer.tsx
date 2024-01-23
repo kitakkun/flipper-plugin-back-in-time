@@ -13,21 +13,21 @@ const rawEventLogSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(appActions.register, (state, action) => {
-        state.logs.push({time: new Date().toUTCString(), label: "register", payload: action.payload});
+        state.logs.push({eventId: crypto.randomUUID().toString(), time: new Date().toUTCString(), label: "register", payload: action.payload});
       })
       .addCase(appActions.registerRelationship, (state, action) => {
-        state.logs.push({time: new Date().toUTCString(), label: "registerRelationship", payload: action.payload});
+        state.logs.push({eventId: crypto.randomUUID().toString(), time: new Date().toUTCString(), label: "registerRelationship", payload: action.payload});
       })
       .addCase(appActions.updateInstanceAliveStatuses, (state, action) => {
-          state.logs.push({time: new Date().toUTCString(), label: "updateInstanceAliveStatus", payload: action.payload});
+          state.logs.push({eventId: crypto.randomUUID().toString(), time: new Date().toUTCString(), label: "updateInstanceAliveStatus", payload: action.payload});
         }
       )
       .addCase(appActions.registerValueChange, (state, action) => {
-          state.logs.push({time: new Date().toUTCString(), label: "notifyValueChange", payload: action.payload});
+          state.logs.push({eventId: crypto.randomUUID().toString(), time: new Date().toUTCString(), label: "notifyValueChange", payload: action.payload});
         }
       )
       .addCase(appActions.registerMethodCall, (state, action) => {
-        state.logs.push({time: new Date().toUTCString(), label: "notifyMethodCall", payload: action.payload});
+        state.logs.push({eventId: crypto.randomUUID().toString(), time: new Date().toUTCString(), label: "notifyMethodCall", payload: action.payload});
       });
   }
 });
