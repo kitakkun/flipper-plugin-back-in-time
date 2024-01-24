@@ -5,6 +5,7 @@ import {Layout, styled, theme} from "flipper-plugin";
 import {RiInstanceFill, RiInstanceLine} from "react-icons/ri";
 import {History} from "@mui/icons-material";
 import {Box} from "@mui/material";
+import {StateHolderType} from "./StateHolderType";
 
 export interface InstanceItem {
   name: string;
@@ -48,7 +49,7 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
       instance.uuid,
       onClickHistory,
       state.showNonDebuggableProperty,
-      "sub",
+      StateHolderType.SUBCLASS,
     )
   );
   return <Layout.Container padv={theme.inlinePaddingV} padh={theme.inlinePaddingH} gap={theme.space.medium} grow={true}>
@@ -83,13 +84,13 @@ function instanceItemToTreeData(
   key: string,
   onClickHistory: (instanceUUID: string) => void,
   showNonDebuggableProperty: boolean,
-  nodeType: "sub" | "super" | "external",
+  stateHolderType: StateHolderType,
   instanceAsProperty?: PropertyItem,
 ): TreeDataNode {
-  const resolveInstanceLabel = (nodeType: string): string => {
-    if (nodeType == "sub") {
+  const resolveInstanceLabel = (stateHolderType: StateHolderType): string => {
+    if (stateHolderType == StateHolderType.SUBCLASS) {
       return instance.uuid;
-    } else if (nodeType == "super") {
+    } else if (stateHolderType == StateHolderType.SUPERCLASS) {
       return "super";
     } else {
       return `external dependency (${instance.uuid})`;
@@ -98,8 +99,8 @@ function instanceItemToTreeData(
   const title = (
     <div style={{padding: theme.space.small}}>
       <Row align={"middle"} gutter={theme.space.small}>
-        {nodeType == "sub" ? <RiInstanceFill/> : <RiInstanceLine/>}
-        <Typography.Text type={"secondary"}> {resolveInstanceLabel(nodeType)} </Typography.Text>
+        {stateHolderType == StateHolderType.SUBCLASS ? <RiInstanceFill/> : <RiInstanceLine/>}
+        <Typography.Text type={"secondary"}> {resolveInstanceLabel(stateHolderType)} </Typography.Text>
       </Row>
       <Row
         justify={"space-between"}
@@ -109,7 +110,7 @@ function instanceItemToTreeData(
           <Typography.Title level={4}>{instance.name}</Typography.Title>
           {instanceAsProperty && <Typography.Text type={"secondary"}>as {instanceAsProperty.name}</Typography.Text>}
         </Box>
-        {(nodeType == "sub" || nodeType == "external") &&
+        {(stateHolderType == StateHolderType.SUBCLASS || stateHolderType == StateHolderType.EXTERNAL) &&
             <Button
                 onClick={(event) => {
                   event.stopPropagation();
@@ -134,7 +135,7 @@ function instanceItemToTreeData(
           `${key}/${property.name}`,
           onClickHistory,
           showNonDebuggableProperty,
-          "external",
+          StateHolderType.EXTERNAL,
           property,
         );
       } else {
@@ -161,14 +162,14 @@ function instanceItemToTreeData(
     `${key}/${instance.superClassName}`,
     onClickHistory,
     showNonDebuggableProperty,
-    "super",
+    StateHolderType.SUPERCLASS,
   ) : undefined;
 
   const getStyle = (): React.CSSProperties => {
     const baseStyle: React.CSSProperties = {background: theme.backgroundWash};
     const borderStyle: React.CSSProperties = {};
 
-    if (nodeType == "sub") {
+    if (stateHolderType == StateHolderType.SUBCLASS) {
       borderStyle.borderTopRightRadius = theme.borderRadius;
       borderStyle.borderTopLeftRadius = theme.borderRadius;
       if (!instance.superInstanceItem) {
