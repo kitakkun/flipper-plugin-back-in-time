@@ -4,6 +4,7 @@ import {DownOutlined, ReloadOutlined} from "@ant-design/icons";
 import {Layout, styled, theme} from "flipper-plugin";
 import {RiInstanceFill, RiInstanceLine} from "react-icons/ri";
 import {History} from "@mui/icons-material";
+import {Box} from "@mui/material";
 
 export interface InstanceItem {
   name: string;
@@ -83,6 +84,7 @@ function instanceItemToTreeData(
   onClickHistory: (instanceUUID: string) => void,
   showNonDebuggableProperty: boolean,
   nodeType: "sub" | "super" | "external",
+  instanceAsProperty?: PropertyItem,
 ): TreeDataNode {
   const resolveInstanceLabel = (nodeType: string): string => {
     if (nodeType == "sub") {
@@ -103,8 +105,11 @@ function instanceItemToTreeData(
         justify={"space-between"}
         align={"middle"}
       >
-        <Typography.Title level={4}>{instance.name}</Typography.Title>
-        {nodeType == "sub" &&
+        <Box>
+          <Typography.Title level={4}>{instance.name}</Typography.Title>
+          {instanceAsProperty && <Typography.Text type={"secondary"}>{instanceAsProperty.name}</Typography.Text>}
+        </Box>
+        {nodeType == "sub" || nodeType == "external" &&
             <Button
                 onClick={(event) => {
                   event.stopPropagation();
@@ -130,6 +135,7 @@ function instanceItemToTreeData(
           onClickHistory,
           showNonDebuggableProperty,
           "external",
+          property,
         );
       } else {
         return {
