@@ -18,6 +18,7 @@ export interface PropertyItem {
   type: string;
   debuggable: boolean;
   eventCount: number;
+  stateHolderInstance?: InstanceItem;
 }
 
 export interface InstanceListState {
@@ -81,13 +82,22 @@ function instanceItemToTreeData(
   key: string,
   onClickHistory: (instanceUUID: string) => void,
   showNonDebuggableProperty: boolean,
-  nodeType: "sub" | "super",
+  nodeType: "sub" | "super" | "external",
 ): TreeDataNode {
+  const resolveInstanceLabel = (nodeType: string): string => {
+    if (nodeType == "sub") {
+      return instance.uuid;
+    } else if (nodeType == "super") {
+      return "super";
+    } else {
+      return `external dependency (${instance.uuid})`;
+    }
+  }
   const title = (
     <div style={{padding: theme.space.small}}>
       <Row align={"middle"} gutter={theme.space.small}>
         {nodeType == "sub" ? <RiInstanceFill/> : <RiInstanceLine/>}
-        <Typography.Text type={"secondary"}> {nodeType == "sub" ? instance.uuid : "super"} </Typography.Text>
+        <Typography.Text type={"secondary"}> {resolveInstanceLabel(nodeType)} </Typography.Text>
       </Row>
       <Row
         justify={"space-between"}
@@ -112,20 +122,33 @@ function instanceItemToTreeData(
 
   const properties = instance.properties
     .filter((property) => showNonDebuggableProperty || property.debuggable)
-    .map((property) => ({
-      title: (
-        <Row justify={"space-between"} align={"middle"} style={{padding: theme.space.small}}>
-          <Typography.Text>{property.name}</Typography.Text>
-          <Row align={"middle"} gutter={theme.space.medium}>
-            <Typography.Text type={"secondary"}>{property.type}</Typography.Text>
-            <Row style={{width: 50}} align={"middle"} justify={"center"}>
-              <Badge count={property.eventCount}/>
+    .map((property) => {
+      if (property.stateHolderInstance) {
+        return instanceItemToTreeData(
+          property.stateHolderInstance,
+          `${key}/${property.name}`,
+          onClickHistory,
+          showNonDebuggableProperty,
+          "external",
+        );
+      } else {
+        return {
+          title: (
+            <Row justify={"space-between"} align={"middle"} style={{padding: theme.space.small}}>
+              {property.stateHolderInstance && <RiInstanceLine color={theme.warningColor}/>}
+              <Typography.Text>{property.name}</Typography.Text>
+              <Row align={"middle"} gutter={theme.space.medium}>
+                <Typography.Text type={"secondary"}>{property.type}</Typography.Text>
+                <Row style={{width: 50}} align={"middle"} justify={"center"}>
+                  <Badge count={property.eventCount}/>
+                </Row>
+              </Row>
             </Row>
-          </Row>
-        </Row>
-      ),
-      key: `${key}/${property.name}`,
-    }));
+          ),
+          key: `${key}/${property.name}`,
+        };
+      }
+    });
 
   const superClassTreeData = instance.superInstanceItem ? instanceItemToTreeData(
     instance.superInstanceItem,

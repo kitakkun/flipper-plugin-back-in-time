@@ -4,6 +4,8 @@ import {persistentStateSelector} from "../../../reducer/PersistentStateReducer";
 import {InstanceItem, InstanceListState, PropertyItem} from "./InstanceListView";
 import {ClassInfo} from "../../../data/ClassInfo";
 import {ValueChangeInfo} from "../../../data/MethodCallInfo";
+import {InstanceInfo} from "../../../data/InstanceInfo";
+import {DependencyInfo} from "../../../data/DependencyInfo";
 
 export const selectInstanceList = createSelector(
   [instanceInfoListSelector, classInfoListSelector, methodCallInfoListSelector, persistentStateSelector, dependencyInfoListSelector],
@@ -11,7 +13,13 @@ export const selectInstanceList = createSelector(
     const aliveInstance = instanceInfoList.filter((instance) => instance.alive)
 
     const instances = aliveInstance.map((instance) =>
-      resolveInstanceInfo(classInfoList, instance.className, instance.uuid, methodCallInfoList.flatMap((info) => info.valueChanges))
+      resolveInstanceInfo(
+        classInfoList,
+        instanceInfoList,
+        dependencyInfoList,
+        instance.className,
+        instance.uuid,
+        methodCallInfoList.flatMap((info) => info.valueChanges)),
     ).filter((instance) => instance != null) as InstanceItem[];
 
     return {
@@ -21,22 +29,42 @@ export const selectInstanceList = createSelector(
   }
 );
 
-function resolveInstanceInfo(classInfoList: ClassInfo[], className: string, instanceUUID: string, allValueChangeEvents: ValueChangeInfo[]): InstanceItem | undefined {
+function resolveInstanceInfo(
+  classInfoList: ClassInfo[],
+  instanceInfoList: InstanceInfo[],
+  dependencyInfoList: DependencyInfo[],
+  className: string,
+  instanceUUID: string,
+  allValueChangeEvents: ValueChangeInfo[],
+): InstanceItem | undefined {
   const classInfo = classInfoList.find((info) => info.name == className);
   if (!classInfo) return;
-  const superTypeInfo = resolveInstanceInfo(classInfoList, classInfo.superClassName, instanceUUID, allValueChangeEvents);
+  const superTypeInfo = resolveInstanceInfo(classInfoList, instanceInfoList, dependencyInfoList, classInfo.superClassName, instanceUUID, allValueChangeEvents);
   return {
     name: classInfo.name,
     superClassName: classInfo.superClassName,
     uuid: instanceUUID,
-    properties: classInfo.properties.map((property) => (
-      {
+    properties: classInfo.properties.map((property) => {
+      const dependingInstanceUUIDs = dependencyInfoList.find((info) => info.uuid == instanceUUID);
+      const propertyInstanceInfo = dependingInstanceUUIDs?.dependsOn?.map((dependingInstanceUUID) =>
+        instanceInfoList.find((info) => info.uuid == dependingInstanceUUID)
+      )?.find((info) => info?.className == property.type);
+
+      return {
         name: property.name,
         type: property.type,
         debuggable: property.debuggable,
         eventCount: allValueChangeEvents.filter((event) => event.propertyName == property.name).length,
-      } as PropertyItem
-    )),
+        stateHolderInstance: propertyInstanceInfo && resolveInstanceInfo(
+          classInfoList,
+          instanceInfoList,
+          dependencyInfoList,
+          property.type,
+          propertyInstanceInfo?.uuid,
+          allValueChangeEvents,
+        ),
+      } as PropertyItem;
+    }),
     superInstanceItem: superTypeInfo,
   };
 }
