@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useMemo} from "react";
 import {Badge, Button, Row, Switch, Tree, TreeDataNode, Typography} from "antd";
 import {DownOutlined, ReloadOutlined} from "@ant-design/icons";
 import {Layout, styled, theme} from "flipper-plugin";
@@ -48,26 +48,35 @@ interface MyTreeDataNode extends TreeDataNode {
 
 interface InstanceTreeDataNode extends MyTreeDataNode {
   nodeType: "instance";
-  instanceUUID: string;
-  propertyName?: string;
+  uuid: string;
+  name: string;
+  nameAsProperty?: string;
+  stateHolderType: StateHolderType;
 }
 
 interface PropertyTreeDataNode extends MyTreeDataNode {
   nodeType: "property";
   instanceUUID: string;
-  propertyName: string;
+  name: string;
+  type: string;
+  eventCount: number;
+  debuggable: boolean;
+}
+
+function isInstanceTreeDataNode(node: any): node is InstanceTreeDataNode {
+  return node.nodeType == "instance";
+}
+
+function isPropertyTreeDataNode(node: any): node is PropertyTreeDataNode {
+  return node.nodeType == "property";
 }
 
 export function InstanceListView({state, onSelectProperty, onClickRefresh, onChangeNonDebuggablePropertyVisible, onClickHistory,}: InstanceListProps) {
-  const treeData: TreeDataNode[] = state.instances.map((instance) =>
-    instanceItemToTreeDataNode(
-      instance,
-      instance.uuid,
-      onClickHistory,
-      state.showNonDebuggableProperty,
-      StateHolderType.SUBCLASS,
-    )
+  const treeData: TreeDataNode[] = useMemo(() =>
+      state.instances.map((instance) => instanceItemToTreeDataNode(instance, StateHolderType.SUBCLASS, state.showNonDebuggableProperty)),
+    [state.instances, state.showNonDebuggableProperty],
   );
+
   return <Layout.Container padv={theme.inlinePaddingV} padh={theme.inlinePaddingH} gap={theme.space.medium} grow={true}>
     <Layout.Horizontal gap={theme.space.medium} style={{display: "flex", alignItems: "center"}}>
       show non-debuggable properties:
@@ -86,19 +95,39 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
           const node = info.node as unknown as MyTreeDataNode;
           if (node.nodeType == "property") {
             const castedNode = node as PropertyTreeDataNode;
-            onSelectProperty(castedNode.instanceUUID, castedNode.propertyName);
+            onSelectProperty(castedNode.instanceUUID, castedNode.name);
           } else if (node.nodeType == "instance") {
             const castedNode = node as InstanceTreeDataNode;
-            onClickHistory(castedNode.instanceUUID);
+            onClickHistory(castedNode.uuid);
           }
         }}
         blockNode
         showLine
         switcherIcon={<DownOutlined/>}
         showIcon
+        titleRender={(node) => {
+          if (isInstanceTreeDataNode(node)) {
+            return instanceNodeTitle(node.name, node.uuid, node.stateHolderType, onClickHistory, node.nameAsProperty);
+          } else if (isPropertyTreeDataNode(node)) {
+            return PropertyNodeTitle(node.name, node.type, node.eventCount)
+          }
+          return <></>;
+        }}
       />
     </Layout.ScrollContainer>
   </Layout.Container>;
+}
+
+function PropertyNodeTitle(name: string, type: string, eventCount: number) {
+  return <Row justify={"space-between"} align={"middle"} style={{padding: theme.space.small}}>
+    <Typography.Text>{name}</Typography.Text>
+    <Row align={"middle"} gutter={theme.space.medium}>
+      <Typography.Text type={"secondary"}>{type}</Typography.Text>
+      <Row style={{width: 50}} align={"middle"} justify={"center"}>
+        <Badge count={eventCount}/>
+      </Row>
+    </Row>
+  </Row>;
 }
 
 /**
@@ -117,38 +146,38 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
  */
 function instanceItemToTreeDataNode(
   instance: InstanceItem,
-  key: string,
-  onClickHistory: (instanceUUID: string) => void,
-  showNonDebuggableProperty: boolean,
   stateHolderType: StateHolderType,
+  showNonDebuggableProperty: boolean,
+  key: string = instance.uuid,
   instanceAsProperty?: PropertyItem,
 ): InstanceTreeDataNode {
-  const title = instanceNodeTitle(instance, stateHolderType, onClickHistory, instanceAsProperty);
+  const filteredProperties = instance.properties.filter((property) => showNonDebuggableProperty || property.debuggable);
 
-  const propertyNodes = instance.properties
-    .filter((property) => showNonDebuggableProperty || property.debuggable)
-    .map((property) => {
-      if (property.stateHolderInstance) {
-        return instanceItemToTreeDataNode(
-          property.stateHolderInstance,
-          `${key}/${property.name}`,
-          onClickHistory,
-          showNonDebuggableProperty,
-          StateHolderType.EXTERNAL,
-          property,
-        );
-      } else {
-        return normalPropertyTreeNode(property, key, instance.uuid);
-      }
-    });
+  const stateHolderPropertyNodes = filteredProperties
+    .filter((property) => property.stateHolderInstance)
+    .map((property) =>
+      instanceItemToTreeDataNode(
+        property.stateHolderInstance!,
+        StateHolderType.EXTERNAL,
+        showNonDebuggableProperty,
+        `${key}/${property.name}`,
+        property,
+      )
+    );
+
+  const normalPropertyNodes = filteredProperties
+    .filter((property) => !property.stateHolderInstance)
+    .map((property) => normalPropertyTreeNode(property, key, instance.uuid));
 
   const superClassTreeDataNode = instance.superInstanceItem ? instanceItemToTreeDataNode(
     instance.superInstanceItem,
-    `${key}/${instance.superClassName}`,
-    onClickHistory,
-    showNonDebuggableProperty,
     StateHolderType.SUPERCLASS,
+    showNonDebuggableProperty,
+    `${key}/${instance.superClassName}`,
   ) : undefined;
+
+  const children = [...stateHolderPropertyNodes, ...normalPropertyNodes];
+  if (superClassTreeDataNode) children.unshift(superClassTreeDataNode);
 
   const getStyle = (): React.CSSProperties => {
     const baseStyle: React.CSSProperties = {background: theme.backgroundWash};
@@ -172,46 +201,43 @@ function instanceItemToTreeDataNode(
 
   return {
     nodeType: "instance",
-    title: title,
     selectable: false,
     key: key,
-    children: superClassTreeDataNode ? [superClassTreeDataNode, ...propertyNodes] : propertyNodes,
     style: getStyle(),
-    instanceUUID: instance.uuid,
-    propertyName: instanceAsProperty?.name,
+    children: children,
+    uuid: instance.uuid,
+    name: instance.name,
+    nameAsProperty: instanceAsProperty?.name,
+    stateHolderType: stateHolderType,
   }
 }
 
-function instanceNodeTitle(instance: InstanceItem, stateHolderType: StateHolderType, onClickHistory: (instanceUUID: string) => void, instanceAsProperty?: PropertyItem) {
-  let label;
-  if (stateHolderType == StateHolderType.SUBCLASS) {
-    label = instance.uuid;
-  } else if (stateHolderType == StateHolderType.SUPERCLASS) {
-    label = "super";
-  } else {
-    label = `external dependency (${instance.uuid})`;
-  }
+function instanceNodeTitle(name: string, uuid: string, stateHolderType: StateHolderType, onClickHistory: (instanceUUID: string) => void, nameAsProperty?: string) {
+  const label = (stateHolderType == StateHolderType.SUBCLASS) ? uuid :
+    (stateHolderType == StateHolderType.SUPERCLASS) ? "super" : `external dependency (${uuid})`;
+
+  const showHistoryButton = stateHolderType != StateHolderType.SUPERCLASS;
+  const instanceIcon = stateHolderType == StateHolderType.SUBCLASS ? <RiInstanceFill/> : <RiInstanceLine/>;
 
   return <div style={{padding: theme.space.small}}>
     <Row align={"middle"} gutter={theme.space.small}>
-      {stateHolderType == StateHolderType.SUBCLASS ? <RiInstanceFill/> : <RiInstanceLine/>}
+      {instanceIcon}
       <Typography.Text type={"secondary"}>{label}</Typography.Text>
     </Row>
     <Row justify={"space-between"} align={"middle"}>
       <Box>
-        <Typography.Title level={4}>{instance.name}</Typography.Title>
-        {instanceAsProperty && <Typography.Text type={"secondary"}>as {instanceAsProperty.name}</Typography.Text>}
+        <Typography.Title level={4}>{name}</Typography.Title>
+        {nameAsProperty && <Typography.Text type={"secondary"}>{nameAsProperty}</Typography.Text>}
       </Box>
-      {(stateHolderType != StateHolderType.SUPERCLASS) &&
+      {showHistoryButton &&
           <Button
               onClick={(event) => {
                 event.stopPropagation();
-                onClickHistory(instance.uuid);
+                onClickHistory(uuid);
               }}
+              style={{padding: theme.space.small, display: "flex", alignItems: "center", justifyItems: "center"}}
           >
-              <Row align={"middle"} gutter={theme.space.medium}>
-                  <History/>History
-              </Row>
+              <History fontSize={"small"}/>History
           </Button>
       }
     </Row>
@@ -221,20 +247,11 @@ function instanceNodeTitle(instance: InstanceItem, stateHolderType: StateHolderT
 function normalPropertyTreeNode(property: PropertyItem, key: string, instanceUUID: string): PropertyTreeDataNode {
   return {
     nodeType: "property",
-    title: (
-      <Row justify={"space-between"} align={"middle"} style={{padding: theme.space.small}}>
-        {property.stateHolderInstance && <RiInstanceLine color={theme.warningColor}/>}
-        <Typography.Text>{property.name}</Typography.Text>
-        <Row align={"middle"} gutter={theme.space.medium}>
-          <Typography.Text type={"secondary"}>{property.type}</Typography.Text>
-          <Row style={{width: 50}} align={"middle"} justify={"center"}>
-            <Badge count={property.eventCount}/>
-          </Row>
-        </Row>
-      </Row>
-    ),
     key: `${key}/${property.name}`,
     instanceUUID: instanceUUID,
-    propertyName: property.name,
+    name: property.name,
+    type: property.type,
+    eventCount: property.eventCount,
+    debuggable: property.debuggable,
   };
 }
