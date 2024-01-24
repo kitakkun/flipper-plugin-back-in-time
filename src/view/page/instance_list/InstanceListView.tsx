@@ -1,5 +1,5 @@
 import React, {useMemo} from "react";
-import {Badge, Button, Row, Switch, Tree, TreeDataNode, Typography} from "antd";
+import {Badge, Button, Col, Row, Switch, Tree, TreeDataNode, Typography} from "antd";
 import {DownOutlined, ReloadOutlined} from "@ant-design/icons";
 import {Layout, styled, theme} from "flipper-plugin";
 import {RiInstanceFill, RiInstanceLine} from "react-icons/ri";
@@ -39,6 +39,22 @@ type InstanceListProps = {
 const StyledTree = styled(Tree)`
   .ant-tree-switcher {
     background: transparent !important;
+  }
+
+  .ant-tree-indent-unit::before {
+    border-color: ${theme.textColorPlaceholder} !important;
+  }
+
+  .ant-tree-indent-unit::after {
+    border-color: ${theme.textColorPlaceholder} !important;
+  }
+
+  .ant-tree-switcher-leaf-line::after {
+    border-color: ${theme.textColorPlaceholder} !important;
+  }
+
+  .ant-tree-switcher-leaf-line::before {
+    border-color: ${theme.textColorPlaceholder} !important;
   }
 `;
 
@@ -119,10 +135,10 @@ function PropertyNodeTitle(name: string, type: string, eventCount: number) {
   return <Row justify={"space-between"} align={"middle"} style={{padding: theme.space.small}}>
     <Typography.Text>{name}</Typography.Text>
     <Row align={"middle"} gutter={theme.space.medium}>
-      <Typography.Text type={"secondary"}>{type}</Typography.Text>
-      <Row style={{width: 50}} align={"middle"} justify={"center"}>
+      <Col><Typography.Text type={"secondary"}>{type}</Typography.Text></Col>
+      <Col style={{width: 50, display: "flex"}}>
         <Badge count={eventCount}/>
-      </Row>
+      </Col>
     </Row>
   </Row>;
 }
@@ -214,12 +230,13 @@ function instanceNodeTitle(name: string, uuid: string, stateHolderType: StateHol
     (stateHolderType == StateHolderType.SUPERCLASS) ? "super" : `external dependency (${uuid})`;
 
   const showHistoryButton = stateHolderType != StateHolderType.SUPERCLASS;
-  const instanceIcon = stateHolderType == StateHolderType.SUBCLASS ? <RiInstanceFill/> : <RiInstanceLine/>;
+  const instanceIcon = stateHolderType == StateHolderType.SUBCLASS ? <RiInstanceFill color={theme.primaryColor}/> :
+    stateHolderType == StateHolderType.SUPERCLASS ? <RiInstanceLine color={theme.warningColor}/> : <RiInstanceLine/>;
 
-  return <div style={{padding: theme.space.small}}>
-    <Row align={"middle"} gutter={theme.space.small}>
-      {instanceIcon}
-      <Typography.Text type={"secondary"}>{label}</Typography.Text>
+  return <div style={{padding: theme.space.tiny}}>
+    <Row align={"middle"} gutter={theme.space.tiny}>
+      <Col style={{display: "flex"}}>{instanceIcon}</Col>
+      <Col><Typography.Text type={"secondary"}>{label}</Typography.Text></Col>
     </Row>
     <Row justify={"space-between"} align={"middle"}>
       <Box>
@@ -232,7 +249,7 @@ function instanceNodeTitle(name: string, uuid: string, stateHolderType: StateHol
                 event.stopPropagation();
                 onClickHistory(uuid);
               }}
-              style={{padding: theme.space.small, display: "flex", alignItems: "center", justifyItems: "center"}}
+              style={{padding: theme.space.tiny, display: "flex", alignItems: "center", justifyItems: "center"}}
           >
               <History fontSize={"small"}/>History
           </Button>
