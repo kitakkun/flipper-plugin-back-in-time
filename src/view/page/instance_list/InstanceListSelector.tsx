@@ -19,7 +19,7 @@ export const selectInstanceList = createSelector(
         dependencyInfoList,
         instance.className,
         instance.uuid,
-        methodCallInfoList.flatMap((info) => info.valueChanges)),
+        methodCallInfoList.filter((info) => info.instanceUUID == instance.uuid).flatMap((info) => info.valueChanges)),
     ).filter((instance) => instance != null) as InstanceItem[];
 
     return {
