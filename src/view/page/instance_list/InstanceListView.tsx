@@ -2,14 +2,15 @@ import React from "react";
 import {Badge, Button, Row, Switch, Tree, TreeDataNode, Typography} from "antd";
 import {DownOutlined, ReloadOutlined} from "@ant-design/icons";
 import {Layout, styled, theme} from "flipper-plugin";
+import {RiInstanceFill, RiInstanceLine} from "react-icons/ri";
 import {History} from "@mui/icons-material";
-import {Box} from "@mui/material";
 
 export interface InstanceItem {
   name: string;
   uuid: string;
   superClassName: string;
   properties: PropertyItem[];
+  superInstanceItem?: InstanceItem;
 }
 
 export interface PropertyItem {
@@ -39,49 +40,15 @@ const StyledTree = styled(Tree)`
 `;
 
 export function InstanceListView({state, onSelectProperty, onClickRefresh, onChangeNonDebuggablePropertyVisible, onClickHistory,}: InstanceListProps) {
-  const treeData: TreeDataNode[] = state.instances.map((instance) => ({
-    style: {padding: theme.space.small, backgroundColor: theme.backgroundWash, borderRadius: theme.borderRadius},
-    title: (
-      <Row
-        justify={"space-between"}
-        align={"middle"}
-      >
-        <Box>
-          <Typography.Title level={4}>{instance.name}</Typography.Title>
-          <Typography.Text type={"secondary"}>uuid: {instance.uuid}</Typography.Text>
-        </Box>
-        <Button
-          onClick={(event) => {
-            event.stopPropagation();
-            onClickHistory(instance.uuid);
-          }}
-        >
-          <Row align={"middle"} gutter={theme.space.medium}>
-            <History/>History
-          </Row>
-        </Button>
-      </Row>
-    ),
-    selectable: false,
-    key: instance.uuid,
-    children: instance.properties
-      .filter((property) => state.showNonDebuggableProperty || property.debuggable)
-      .map((property) => ({
-        title: (
-          <Row justify={"space-between"} align={"middle"} style={{padding: theme.space.small}}>
-            <Typography.Text>{property.name}</Typography.Text>
-            <Row align={"middle"} gutter={theme.space.medium}>
-              <Typography.Text type={"secondary"}>{property.type}</Typography.Text>
-              <Row style={{width: 50}} align={"middle"} justify={"center"}>
-                <Badge count={property.eventCount}/>
-              </Row>
-            </Row>
-          </Row>
-        ),
-        key: `${instance.uuid}/${property.name}`
-      }))
-  }));
-
+  const treeData: TreeDataNode[] = state.instances.map((instance) =>
+    instanceItemToTreeData(
+      instance,
+      instance.uuid,
+      onClickHistory,
+      state.showNonDebuggableProperty,
+      "sub",
+    )
+  );
   return <Layout.Container padv={theme.inlinePaddingV} padh={theme.inlinePaddingH} gap={theme.space.medium} grow={true}>
     <Layout.Horizontal gap={theme.space.medium} style={{display: "flex", alignItems: "center"}}>
       show non-debuggable properties:
@@ -103,8 +70,76 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
         blockNode
         showLine
         switcherIcon={<DownOutlined/>}
+        showIcon
       />
     </Layout.ScrollContainer>
   </Layout.Container>;
 }
 
+function instanceItemToTreeData(
+  instance: InstanceItem,
+  key: string,
+  onClickHistory: (instanceUUID: string) => void,
+  showNonDebuggableProperty: boolean,
+  nodeType: "sub" | "super",
+): TreeDataNode {
+  const title = (
+    <div style={{padding: theme.space.small}}>
+      <Row align={"middle"} gutter={theme.space.small}>
+        {nodeType == "sub" ? <RiInstanceFill/> : <RiInstanceLine/>}
+        <Typography.Text type={"secondary"}> {nodeType == "sub" ? instance.uuid : "super"} </Typography.Text>
+      </Row>
+      <Row
+        justify={"space-between"}
+        align={"middle"}
+      >
+        <Typography.Title level={4}>{instance.name}</Typography.Title>
+        {nodeType == "sub" &&
+            <Button
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onClickHistory(instance.uuid);
+                }}
+            >
+                <Row align={"middle"} gutter={theme.space.medium}>
+                    <History/>History
+                </Row>
+            </Button>
+        }
+      </Row>
+    </div>
+  );
+
+  const properties = instance.properties
+    .filter((property) => showNonDebuggableProperty || property.debuggable)
+    .map((property) => ({
+      title: (
+        <Row justify={"space-between"} align={"middle"} style={{padding: theme.space.small}}>
+          <Typography.Text>{property.name}</Typography.Text>
+          <Row align={"middle"} gutter={theme.space.medium}>
+            <Typography.Text type={"secondary"}>{property.type}</Typography.Text>
+            <Row style={{width: 50}} align={"middle"} justify={"center"}>
+              <Badge count={property.eventCount}/>
+            </Row>
+          </Row>
+        </Row>
+      ),
+      key: `${key}/${property.name}`,
+    }));
+
+  const superClassTreeData = instance.superInstanceItem ? instanceItemToTreeData(
+    instance.superInstanceItem,
+    `${key}/${instance.superClassName}`,
+    onClickHistory,
+    showNonDebuggableProperty,
+    "super",
+  ) : undefined;
+
+  return {
+    title: title,
+    selectable: false,
+    key: key,
+    children: superClassTreeData ? [superClassTreeData, ...properties] : properties,
+    style: {background: theme.backgroundWash},
+  }
+}
