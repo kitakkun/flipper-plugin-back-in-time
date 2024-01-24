@@ -135,11 +135,31 @@ function instanceItemToTreeData(
     "super",
   ) : undefined;
 
+  const getStyle = (): React.CSSProperties => {
+    const baseStyle: React.CSSProperties = {background: theme.backgroundWash};
+    const borderStyle: React.CSSProperties = {};
+
+    if (nodeType == "sub") {
+      borderStyle.borderTopRightRadius = theme.borderRadius;
+      borderStyle.borderTopLeftRadius = theme.borderRadius;
+      if (!instance.superInstanceItem) {
+        borderStyle.borderBottomLeftRadius = theme.borderRadius;
+        borderStyle.borderBottomRightRadius = theme.borderRadius;
+      }
+    } else {
+      if (!instance.superInstanceItem) {
+        borderStyle.borderBottomLeftRadius = theme.borderRadius;
+        borderStyle.borderBottomRightRadius = theme.borderRadius;
+      }
+    }
+    return {...baseStyle, ...borderStyle};
+  }
+
   return {
     title: title,
     selectable: false,
     key: key,
     children: superClassTreeData ? [superClassTreeData, ...properties] : properties,
-    style: {background: theme.backgroundWash},
+    style: getStyle(),
   }
 }
