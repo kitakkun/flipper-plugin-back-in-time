@@ -92,13 +92,10 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
       <StyledTree
         treeData={treeData}
         onSelect={(_, info) => {
-          const node = info.node as unknown as MyTreeDataNode;
-          if (node.nodeType == "property") {
-            const castedNode = node as PropertyTreeDataNode;
-            onSelectProperty(castedNode.instanceUUID, castedNode.name);
-          } else if (node.nodeType == "instance") {
-            const castedNode = node as InstanceTreeDataNode;
-            onClickHistory(castedNode.uuid);
+          if (isInstanceTreeDataNode(info.node)) {
+            onClickHistory(info.node.uuid);
+          } else if (isPropertyTreeDataNode(info.node)) {
+            onSelectProperty(info.node.instanceUUID, info.node.name);
           }
         }}
         blockNode
