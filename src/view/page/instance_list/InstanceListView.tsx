@@ -42,6 +42,22 @@ const StyledTree = styled(Tree)`
   }
 `;
 
+interface MyTreeDataNode extends TreeDataNode {
+  nodeType: "instance" | "property";
+}
+
+interface InstanceTreeDataNode extends MyTreeDataNode {
+  nodeType: "instance";
+  instanceUUID: string;
+  propertyName?: string;
+}
+
+interface PropertyTreeDataNode extends MyTreeDataNode {
+  nodeType: "property";
+  instanceUUID: string;
+  propertyName: string;
+}
+
 export function InstanceListView({state, onSelectProperty, onClickRefresh, onChangeNonDebuggablePropertyVisible, onClickHistory,}: InstanceListProps) {
   const treeData: TreeDataNode[] = state.instances.map((instance) =>
     instanceItemToTreeDataNode(
@@ -66,9 +82,15 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
     <Layout.ScrollContainer>
       <StyledTree
         treeData={treeData}
-        onSelect={(selectedKeys, info) => {
-          const nodeInfo = info.node.key.toString().split("/");
-          nodeInfo.length == 2 && onSelectProperty(nodeInfo[0], nodeInfo[1]);
+        onSelect={(_, info) => {
+          const node = info.node as unknown as MyTreeDataNode;
+          if (node.nodeType == "property") {
+            const castedNode = node as PropertyTreeDataNode;
+            onSelectProperty(castedNode.instanceUUID, castedNode.propertyName);
+          } else if (node.nodeType == "instance") {
+            const castedNode = node as InstanceTreeDataNode;
+            onClickHistory(castedNode.instanceUUID);
+          }
         }}
         blockNode
         showLine
@@ -79,6 +101,20 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
   </Layout.Container>;
 }
 
+/**
+ * construct tree data node from instance item
+ * example:
+ * - root(subclass) node
+ *   - super class node
+ *   - property node(state holder)
+ *   - property node(normal)
+ *
+ * keys:
+ * - root(subclass) node: instance.uuid
+ * - super class node: instance.uuid/instance.superClassName
+ * - property node(state holder): instance.uuid/property.name/property.stateHolderInstance.uuid/...
+ * - property node(normal): instance.uuid/property.name
+ */
 function instanceItemToTreeDataNode(
   instance: InstanceItem,
   key: string,
@@ -86,7 +122,7 @@ function instanceItemToTreeDataNode(
   showNonDebuggableProperty: boolean,
   stateHolderType: StateHolderType,
   instanceAsProperty?: PropertyItem,
-): TreeDataNode {
+): InstanceTreeDataNode {
   const title = instanceNodeTitle(instance, stateHolderType, onClickHistory, instanceAsProperty);
 
   const propertyNodes = instance.properties
@@ -102,7 +138,7 @@ function instanceItemToTreeDataNode(
           property,
         );
       } else {
-        return normalPropertyTreeNode(property, key);
+        return normalPropertyTreeNode(property, key, instance.uuid);
       }
     });
 
@@ -135,11 +171,14 @@ function instanceItemToTreeDataNode(
   }
 
   return {
+    nodeType: "instance",
     title: title,
     selectable: false,
     key: key,
     children: superClassTreeDataNode ? [superClassTreeDataNode, ...propertyNodes] : propertyNodes,
     style: getStyle(),
+    instanceUUID: instance.uuid,
+    propertyName: instanceAsProperty?.name,
   }
 }
 
@@ -179,8 +218,9 @@ function instanceNodeTitle(instance: InstanceItem, stateHolderType: StateHolderT
   </div>;
 }
 
-function normalPropertyTreeNode(property: PropertyItem, key: string): TreeDataNode {
+function normalPropertyTreeNode(property: PropertyItem, key: string, instanceUUID: string): PropertyTreeDataNode {
   return {
+    nodeType: "property",
     title: (
       <Row justify={"space-between"} align={"middle"} style={{padding: theme.space.small}}>
         {property.stateHolderInstance && <RiInstanceLine color={theme.warningColor}/>}
@@ -194,5 +234,7 @@ function normalPropertyTreeNode(property: PropertyItem, key: string): TreeDataNo
       </Row>
     ),
     key: `${key}/${property.name}`,
+    instanceUUID: instanceUUID,
+    propertyName: property.name,
   };
 }

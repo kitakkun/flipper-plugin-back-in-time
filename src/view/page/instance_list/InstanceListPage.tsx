@@ -17,12 +17,9 @@ export function InstanceListPage() {
     <InstanceListView
       state={state}
       onSelectProperty={(instanceUUID, propertyName) => {
-        const instanceInfo = state.instances.find((instance) => instance.uuid == instanceUUID);
-        const propertyInfo = instanceInfo?.properties?.find((property) => property.name == propertyName);
-        if (!instanceInfo || !propertyInfo) return;
         dispatch(propertyInspectorActions.openPropertyInspector({
-          instanceUUID: instanceInfo.uuid,
-          propertyName: propertyInfo.name,
+          instanceUUID: instanceUUID,
+          propertyName: propertyName,
         }))
       }}
       onClickRefresh={() => {
