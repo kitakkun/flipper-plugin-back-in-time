@@ -107,9 +107,9 @@ function instanceItemToTreeData(
       >
         <Box>
           <Typography.Title level={4}>{instance.name}</Typography.Title>
-          {instanceAsProperty && <Typography.Text type={"secondary"}>{instanceAsProperty.name}</Typography.Text>}
+          {instanceAsProperty && <Typography.Text type={"secondary"}>as {instanceAsProperty.name}</Typography.Text>}
         </Box>
-        {nodeType == "sub" || nodeType == "external" &&
+        {(nodeType == "sub" || nodeType == "external") &&
             <Button
                 onClick={(event) => {
                   event.stopPropagation();
