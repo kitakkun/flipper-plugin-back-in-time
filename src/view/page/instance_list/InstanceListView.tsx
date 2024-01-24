@@ -44,7 +44,7 @@ const StyledTree = styled(Tree)`
 
 export function InstanceListView({state, onSelectProperty, onClickRefresh, onChangeNonDebuggablePropertyVisible, onClickHistory,}: InstanceListProps) {
   const treeData: TreeDataNode[] = state.instances.map((instance) =>
-    instanceItemToTreeData(
+    instanceItemToTreeDataNode(
       instance,
       instance.uuid,
       onClickHistory,
@@ -79,7 +79,7 @@ export function InstanceListView({state, onSelectProperty, onClickRefresh, onCha
   </Layout.Container>;
 }
 
-function instanceItemToTreeData(
+function instanceItemToTreeDataNode(
   instance: InstanceItem,
   key: string,
   onClickHistory: (instanceUUID: string) => void,
@@ -87,50 +87,13 @@ function instanceItemToTreeData(
   stateHolderType: StateHolderType,
   instanceAsProperty?: PropertyItem,
 ): TreeDataNode {
-  const resolveInstanceLabel = (stateHolderType: StateHolderType): string => {
-    if (stateHolderType == StateHolderType.SUBCLASS) {
-      return instance.uuid;
-    } else if (stateHolderType == StateHolderType.SUPERCLASS) {
-      return "super";
-    } else {
-      return `external dependency (${instance.uuid})`;
-    }
-  }
-  const title = (
-    <div style={{padding: theme.space.small}}>
-      <Row align={"middle"} gutter={theme.space.small}>
-        {stateHolderType == StateHolderType.SUBCLASS ? <RiInstanceFill/> : <RiInstanceLine/>}
-        <Typography.Text type={"secondary"}> {resolveInstanceLabel(stateHolderType)} </Typography.Text>
-      </Row>
-      <Row
-        justify={"space-between"}
-        align={"middle"}
-      >
-        <Box>
-          <Typography.Title level={4}>{instance.name}</Typography.Title>
-          {instanceAsProperty && <Typography.Text type={"secondary"}>as {instanceAsProperty.name}</Typography.Text>}
-        </Box>
-        {(stateHolderType == StateHolderType.SUBCLASS || stateHolderType == StateHolderType.EXTERNAL) &&
-            <Button
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onClickHistory(instance.uuid);
-                }}
-            >
-                <Row align={"middle"} gutter={theme.space.medium}>
-                    <History/>History
-                </Row>
-            </Button>
-        }
-      </Row>
-    </div>
-  );
+  const title = instanceNodeTitle(instance, stateHolderType, onClickHistory, instanceAsProperty);
 
-  const properties = instance.properties
+  const propertyNodes = instance.properties
     .filter((property) => showNonDebuggableProperty || property.debuggable)
     .map((property) => {
       if (property.stateHolderInstance) {
-        return instanceItemToTreeData(
+        return instanceItemToTreeDataNode(
           property.stateHolderInstance,
           `${key}/${property.name}`,
           onClickHistory,
@@ -139,25 +102,11 @@ function instanceItemToTreeData(
           property,
         );
       } else {
-        return {
-          title: (
-            <Row justify={"space-between"} align={"middle"} style={{padding: theme.space.small}}>
-              {property.stateHolderInstance && <RiInstanceLine color={theme.warningColor}/>}
-              <Typography.Text>{property.name}</Typography.Text>
-              <Row align={"middle"} gutter={theme.space.medium}>
-                <Typography.Text type={"secondary"}>{property.type}</Typography.Text>
-                <Row style={{width: 50}} align={"middle"} justify={"center"}>
-                  <Badge count={property.eventCount}/>
-                </Row>
-              </Row>
-            </Row>
-          ),
-          key: `${key}/${property.name}`,
-        };
+        return normalPropertyTreeNode(property, key);
       }
     });
 
-  const superClassTreeData = instance.superInstanceItem ? instanceItemToTreeData(
+  const superClassTreeDataNode = instance.superInstanceItem ? instanceItemToTreeDataNode(
     instance.superInstanceItem,
     `${key}/${instance.superClassName}`,
     onClickHistory,
@@ -189,7 +138,61 @@ function instanceItemToTreeData(
     title: title,
     selectable: false,
     key: key,
-    children: superClassTreeData ? [superClassTreeData, ...properties] : properties,
+    children: superClassTreeDataNode ? [superClassTreeDataNode, ...propertyNodes] : propertyNodes,
     style: getStyle(),
   }
+}
+
+function instanceNodeTitle(instance: InstanceItem, stateHolderType: StateHolderType, onClickHistory: (instanceUUID: string) => void, instanceAsProperty?: PropertyItem) {
+  let label;
+  if (stateHolderType == StateHolderType.SUBCLASS) {
+    label = instance.uuid;
+  } else if (stateHolderType == StateHolderType.SUPERCLASS) {
+    label = "super";
+  } else {
+    label = `external dependency (${instance.uuid})`;
+  }
+
+  return <div style={{padding: theme.space.small}}>
+    <Row align={"middle"} gutter={theme.space.small}>
+      {stateHolderType == StateHolderType.SUBCLASS ? <RiInstanceFill/> : <RiInstanceLine/>}
+      <Typography.Text type={"secondary"}>{label}</Typography.Text>
+    </Row>
+    <Row justify={"space-between"} align={"middle"}>
+      <Box>
+        <Typography.Title level={4}>{instance.name}</Typography.Title>
+        {instanceAsProperty && <Typography.Text type={"secondary"}>as {instanceAsProperty.name}</Typography.Text>}
+      </Box>
+      {(stateHolderType != StateHolderType.SUPERCLASS) &&
+          <Button
+              onClick={(event) => {
+                event.stopPropagation();
+                onClickHistory(instance.uuid);
+              }}
+          >
+              <Row align={"middle"} gutter={theme.space.medium}>
+                  <History/>History
+              </Row>
+          </Button>
+      }
+    </Row>
+  </div>;
+}
+
+function normalPropertyTreeNode(property: PropertyItem, key: string): TreeDataNode {
+  return {
+    title: (
+      <Row justify={"space-between"} align={"middle"} style={{padding: theme.space.small}}>
+        {property.stateHolderInstance && <RiInstanceLine color={theme.warningColor}/>}
+        <Typography.Text>{property.name}</Typography.Text>
+        <Row align={"middle"} gutter={theme.space.medium}>
+          <Typography.Text type={"secondary"}>{property.type}</Typography.Text>
+          <Row style={{width: 50}} align={"middle"} justify={"center"}>
+            <Badge count={property.eventCount}/>
+          </Row>
+        </Row>
+      </Row>
+    ),
+    key: `${key}/${property.name}`,
+  };
 }
