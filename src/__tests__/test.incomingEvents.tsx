@@ -17,12 +17,14 @@ test(`register event`, () => {
       {
         name: "hoge",
         debuggable: true,
+        isDebuggableStateHolder: false,
         propertyType: "java.lang.String",
         valueType: "java.lang.String"
       },
       {
         name: "fuga",
         debuggable: false,
+        isDebuggableStateHolder: false,
         propertyType: "java.lang.String",
         valueType: "java.lang.String"
       }
@@ -45,12 +47,14 @@ test(`register event`, () => {
       {
         name: "hoge",
         debuggable: true,
+        isDebuggableStateHolder: false,
         type: "java.lang.String",
         valueType: "java.lang.String"
       },
       {
         name: "fuga",
         debuggable: false,
+        isDebuggableStateHolder: false,
         type: "java.lang.String",
         valueType: "java.lang.String"
       }

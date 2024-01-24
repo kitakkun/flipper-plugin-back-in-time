@@ -1,6 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {appActions} from "../../../reducer/appReducer";
 import {RawEventLogState} from "./RawLogView";
+import crypto from "crypto";
 
 const initialState: RawEventLogState = {
   logs: [],
