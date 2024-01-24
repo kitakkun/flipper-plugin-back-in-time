@@ -24,6 +24,7 @@ export type RegisterInstance = {
 interface PropertyInfo {
   name: string;
   debuggable: boolean;
+  isDebuggableStateHolder: boolean;
   propertyType: string;
   valueType: string;
 }

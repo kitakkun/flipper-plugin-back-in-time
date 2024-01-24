@@ -61,6 +61,7 @@ const appSlice = createSlice({
             type: property.propertyType,
             valueType: property.valueType,
             debuggable: property.debuggable,
+            isDebuggableStateHolder: property.isDebuggableStateHolder,
           }
         )),
       });

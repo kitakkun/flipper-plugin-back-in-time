@@ -9,4 +9,5 @@ export interface PropertyInfo {
   type: string;
   valueType: string;
   debuggable: boolean;
+  isDebuggableStateHolder: boolean;
 }
