@@ -10,12 +10,21 @@ export const propertyInspectorStateSelector = createSelector(
     const instanceInfo = instanceInfoList.find((info) => info.uuid == state?.instanceUUID)
     const propertyInfo = instanceInfo && getPropertiesRecursively(classInfoList, instanceInfo?.className)
       .find((info) => info.name == state?.propertyName);
-    const filteredMethodCallInfoList = methodCallInfoList.filter((event) => event.instanceUUID == state?.instanceUUID && event.valueChanges.some((change) => change.propertyName == state?.propertyName));
+
+    const valueChanges = methodCallInfoList.filter((info) =>
+      info.instanceUUID == state.instanceUUID && info.valueChanges.some((change) => change.propertyName == state.propertyName)
+    ).map((info) => {
+      return {
+        methodCallUUID: info.callUUID,
+        time: info.calledAt,
+        value: info.valueChanges.reverse().find((change) => change.propertyName == state.propertyName)?.value ?? "",
+      }
+    });
 
     return {
       instanceInfo: instanceInfo,
       propertyInfo: propertyInfo,
-      methodCallInfoList: filteredMethodCallInfoList,
+      valueChanges: valueChanges,
     } as PropertyInspectorState;
   }
 );

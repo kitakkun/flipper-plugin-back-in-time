@@ -3,19 +3,24 @@ import {InstanceDescriptionsView} from "./InstanceDescriptionsView";
 import {PropertyDescriptionsView} from "./PropertyDescriptionsView";
 import {PropertyValueChangesView} from "./PropertyValueChangesView";
 import {Layout, theme} from "flipper-plugin";
-import {MethodCallInfo} from "../../../data/MethodCallInfo";
 import {InstanceInfo} from "../../../data/InstanceInfo";
 import {PropertyInfo} from "../../../data/ClassInfo";
+
+export interface ValueChangeInfo {
+  methodCallUUID: string;
+  time: number;
+  value: string;
+}
 
 export interface PropertyInspectorState {
   instanceInfo: InstanceInfo | undefined;
   propertyInfo: PropertyInfo | undefined;
-  methodCallInfoList: MethodCallInfo[];
+  valueChanges: ValueChangeInfo[];
 }
 
 type PropertyInspectorProps = {
   state: PropertyInspectorState;
-  onClickValueChangeInfo: (methodCallInfo: MethodCallInfo) => void;
+  onClickValueChangeInfo: (methodCallUUID: string) => void;
 }
 
 export default function PropertyInspectorView(
@@ -33,10 +38,9 @@ export default function PropertyInspectorView(
         <InstanceDescriptionsView instanceInfo={state.instanceInfo}/>
         <PropertyDescriptionsView propertyInfo={state.propertyInfo}/>
         <PropertyValueChangesView
-          methodCallInfoList={state.methodCallInfoList}
-          selectedPropertyInfo={state.propertyInfo}
-          onClickRow={(methodCallInfo) => {
-            onClickValueChangeInfo(methodCallInfo)
+          valueChanges={state.valueChanges}
+          onClickRow={(methodCallUUID) => {
+            onClickValueChangeInfo(methodCallUUID)
           }}/>
       </Layout.Container>
     </>

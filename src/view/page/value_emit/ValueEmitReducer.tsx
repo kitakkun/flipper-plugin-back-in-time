@@ -1,24 +1,22 @@
 import {createSelector, createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {MethodCallInfo} from "../../../data/MethodCallInfo";
-import {InstanceInfo} from "../../../data/InstanceInfo";
-import {classInfoListSelector} from "../../../reducer/appReducer";
+import {classInfoListSelector, instanceInfoListSelector, methodCallInfoListSelector} from "../../../reducer/appReducer";
 import {ValueEmitState} from "./ValueEmitView";
 
 export interface ValueEmitNavArguments {
-  instanceInfo: InstanceInfo;
-  methodCallInfo: MethodCallInfo;
+  instanceUUID: string;
+  methodCallUUID: string;
 }
 
 interface ValueEmitReducerState {
   open: boolean;
-  instanceInfo: InstanceInfo | null;
-  methodCallInfo: MethodCallInfo | null;
+  instanceUUID?: string;
+  methodCallUUID?: string;
 }
 
 const initialState: ValueEmitReducerState = {
   open: false,
-  instanceInfo: null,
-  methodCallInfo: null,
+  instanceUUID: undefined,
+  methodCallUUID: undefined,
 };
 
 const valueEmitSlice = createSlice({
@@ -26,11 +24,13 @@ const valueEmitSlice = createSlice({
   initialState: initialState,
   reducers: {
     open: (state, action: PayloadAction<ValueEmitNavArguments>) => {
-      state.instanceInfo = action.payload.instanceInfo;
-      state.methodCallInfo = action.payload.methodCallInfo;
+      state.instanceUUID = action.payload.instanceUUID;
+      state.methodCallUUID = action.payload.methodCallUUID;
       state.open = true;
     },
     close: (state) => {
+      state.instanceUUID = undefined;
+      state.methodCallUUID = undefined;
       state.open = false;
     }
   },
@@ -39,16 +39,18 @@ const valueEmitSlice = createSlice({
 export const valueEmitActions = valueEmitSlice.actions;
 export const valueEmitReducer = valueEmitSlice.reducer;
 
-const selectValueEmitState = (state: any) => state.valueEmit as ValueEmitState;
+const selectValueEmitState = (state: any) => state.valueEmit as ValueEmitReducerState;
 export const valueEmitStateSelector = createSelector(
-  [selectValueEmitState, classInfoListSelector],
-  (state, classInfoList) => {
-    const classInfo = classInfoList.find((info) => info.name == state.instanceInfo?.className);
+  [selectValueEmitState, classInfoListSelector, instanceInfoListSelector, methodCallInfoListSelector],
+  (state, classInfoList, instanceInfoList, methodCallInfoList) => {
+    const instanceInfo = instanceInfoList.find((info) => info.uuid == state.instanceUUID);
+    const methodCallInfo = methodCallInfoList.find((info) => info.callUUID == state.methodCallUUID);
+    const classInfo = classInfoList.find((info) => info.name == instanceInfo?.className);
 
     return {
       open: state.open,
-      instanceInfo: state.instanceInfo,
-      methodCallInfo: state.methodCallInfo,
+      instanceInfo: instanceInfo,
+      methodCallInfo: methodCallInfo,
       classInfo: classInfo,
     } as ValueEmitState;
   }

@@ -13,9 +13,9 @@ export function PropertyInspectorPage() {
     <ValueEmitModalPage/>
     <PropertyInspectorView
       state={state}
-      onClickValueChangeInfo={(methodCallInfo) => {
+      onClickValueChangeInfo={(methodCallUUID) => {
         if (!state.instanceInfo) return;
-        dispatch(valueEmitActions.open({instanceInfo: state.instanceInfo, methodCallInfo: methodCallInfo}));
+        dispatch(valueEmitActions.open({instanceUUID: state.instanceInfo.uuid, methodCallUUID: methodCallUUID}));
       }}
     />
   </>;

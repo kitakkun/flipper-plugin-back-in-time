@@ -1,15 +1,13 @@
 import {Table, Typography} from "antd";
 import React from "react";
-import {MethodCallInfo} from "../../../data/MethodCallInfo";
-import {PropertyInfo} from "../../../data/ClassInfo";
+import {ValueChangeInfo} from "./PropertyInspectorView";
 
 type PropertyValueChangeTableProps = {
-  selectedPropertyInfo: PropertyInfo;
-  methodCallInfoList: MethodCallInfo[];
-  onClickRow: (methodCallInfo: MethodCallInfo) => void;
+  valueChanges: ValueChangeInfo[];
+  onClickRow: (methodCallUUID: string) => void;
 }
 
-export function PropertyValueChangesView({selectedPropertyInfo, methodCallInfoList, onClickRow}: PropertyValueChangeTableProps) {
+export function PropertyValueChangesView({valueChanges, onClickRow}: PropertyValueChangeTableProps) {
   const columns = [
     {
       title: 'Time',
@@ -23,35 +21,16 @@ export function PropertyValueChangesView({selectedPropertyInfo, methodCallInfoLi
     },
   ];
 
-  const dataSource = methodCallInfoList.flatMap((methodCallInfo) => {
-    return methodCallInfo
-      .valueChanges
-      .filter((valueChange) => valueChange.propertyName == selectedPropertyInfo.name)
-      .flatMap((valueChange) => {
-        return {
-          time: methodCallInfo.calledAt,
-          value: valueChange.value,
-        }
-      });
-  });
-
-  return <>
-    <Typography.Title level={5}>Value Change Log</Typography.Title>
-    <Table
-      dataSource={dataSource}
-      columns={columns}
-      scroll={{x: true}}
-      size={"small"}
-      onRow={(record, _) => {
-        return {
-          onClick: (event) => {
-            const correspondingMethodCallInfo = methodCallInfoList
-              .find((methodCallInfo) => methodCallInfo.calledAt == record.time);
-            if (!correspondingMethodCallInfo) return;
-            onClickRow(correspondingMethodCallInfo)
-          }
-        };
-      }}
-    />
-  </>
+  return <Table
+    title={() => <Typography.Title level={5}>Value Changes</Typography.Title>}
+    columns={columns}
+    dataSource={valueChanges}
+    scroll={{x: true}}
+    size={"small"}
+    onRow={(record) => {
+      return {
+        onClick: () => onClickRow(record.methodCallUUID)
+      }
+    }}
+  />;
 }
