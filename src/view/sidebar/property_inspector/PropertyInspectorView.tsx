@@ -1,6 +1,6 @@
 import React from "react";
-import {InstanceInfoView} from "./InstanceInfoView";
-import {PropertyInfoView} from "./PropertyInfoView";
+import {InstanceDescriptionsView} from "./InstanceDescriptionsView";
+import {PropertyDescriptionsView} from "./PropertyDescriptionsView";
 import {PropertyValueChangesView} from "./PropertyValueChangesView";
 import {Layout, theme} from "flipper-plugin";
 import {MethodCallInfo} from "../../../data/MethodCallInfo";
@@ -30,8 +30,8 @@ export default function PropertyInspectorView(
   return (
     <>
       <Layout.Container gap={theme.space.medium} pad={theme.inlinePaddingH}>
-        <InstanceInfoView instanceInfo={state.instanceInfo}/>
-        <PropertyInfoView propertyInfo={state.propertyInfo}/>
+        <InstanceDescriptionsView instanceInfo={state.instanceInfo}/>
+        <PropertyDescriptionsView propertyInfo={state.propertyInfo}/>
         <PropertyValueChangesView
           methodCallInfoList={state.methodCallInfoList}
           selectedPropertyInfo={state.propertyInfo}
