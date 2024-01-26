@@ -7,7 +7,7 @@ import {ClassInfo, PropertyInfo} from "../../../data/ClassInfo";
 export const propertyInspectorStateSelector = createSelector(
   [instanceInfoListSelector, classInfoListSelector, methodCallInfoListSelector, propertyInspectorReducerStateSelector],
   (instanceInfoList, classInfoList, methodCallInfoList, state) => {
-    const instanceInfo = instanceInfoList.find((info) => info.uuid == state?.instanceUUID)
+    const instanceInfo = instanceInfoList.find((info) => info.uuid == state.instanceUUID);
     const propertyInfo = instanceInfo && getPropertiesRecursively(classInfoList, instanceInfo?.className)
       .find((info) => info.name == state?.propertyName);
 
