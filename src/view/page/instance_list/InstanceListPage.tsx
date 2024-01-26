@@ -31,6 +31,6 @@ export function InstanceListPage() {
       onClickHistory={(instanceUUID) => {
         dispatch(backInTimeActions.open({instanceUUID: instanceUUID}));
       }}
-    />;
+    />
   </>
 }
