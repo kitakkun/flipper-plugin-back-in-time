@@ -17,7 +17,7 @@ export const propertyInspectorStateSelector = createSelector(
       return {
         methodCallUUID: info.callUUID,
         time: info.calledAt,
-        value: info.valueChanges.reverse().find((change) => change.propertyName == state.propertyName)?.value ?? "",
+        value: [...info.valueChanges].reverse().find((change) => change.propertyName == state.propertyName)?.value ?? "",
       }
     });
 
