@@ -1,5 +1,7 @@
 # flipper-plugin-back-in-time
 
+[[English](README.md) | 日本語]
+
 [back-in-time-plugin](https://github.com/kitakkun/back-in-time-plugin) を用いてコンパイルしたプログラムと連携し，
 実際に flipper を介して back-in-time デバッグを行うためのプラグインです．
 

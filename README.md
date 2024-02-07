@@ -1,5 +1,7 @@
 # flipper-plugin-back-in-time
 
+[English | [日本語](README-ja.md)]
+
 This plugin enables back-in-time debugging through Flipper for compiled programs
 using [back-in-time-plugin](https://github.com/kitakkun/back-in-time-plugin).
 
