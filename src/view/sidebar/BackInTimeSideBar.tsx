@@ -9,7 +9,7 @@ export function BackInTimeSideBar() {
   const appState = useSelector(appStateSelector);
 
   return (
-    <DetailSidebar width={600}>
+    <DetailSidebar>
       {appState.activeTabIndex == '1' && <PropertyInspectorPage/>}
       {appState.activeTabIndex == '2' && <RawLogInspectorPage/>}
     </DetailSidebar>
