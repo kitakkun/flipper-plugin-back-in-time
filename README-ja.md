@@ -7,6 +7,21 @@
 
 ![screenshot](docs/assets/main-screenshot.png)
 
+## デモ
+
+### プロパティ情報の閲覧
+
+https://github.com/kitakkun/flipper-plugin-back-in-time/assets/48154936/0bf7159b-3aea-49d1-bfee-8dca908c1b68
+
+### 変更の追跡
+
+https://github.com/kitakkun/flipper-plugin-back-in-time/assets/48154936/ad57283e-dee4-4bb2-a025-e7f12f2e61d4
+
+### 状態の巻き戻し
+
+https://github.com/kitakkun/flipper-plugin-back-in-time/assets/48154936/dd3bb86a-d366-44da-b25a-b323ca7dc570
+
+
 ## インストール
 
 このプロジェクトは現在開発中であり，正式リリースはありません．
